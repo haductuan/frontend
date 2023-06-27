@@ -72,7 +72,6 @@ const Attestation = () => {
   const [requestData, setRequestData] = useState<any>({});
   const [endpointURLs, setEndpointURLs] = useState<any>();
   const [allClaims, setAllclaims] = useState<any>();
-  const [oraiUserSig, setOraiUserSig] = useState<any>();
   const [geningProofStatus, setGeningProofStatus] = useState<AttestStatus>(
     AttestStatus.Pending
   );
@@ -87,20 +86,6 @@ const Attestation = () => {
   const [openDetail, setOpenDetail] = React.useState(true);
   const { enqueueSnackbar } = useSnackbar();
   const [providerData, setProviderData] = useState<any>();
-  /**
-   * Get orai wallet user signal
-   */
-  const getUserSig = async () => {
-    if (checkUserType() === userType.oraiWeb) {
-      //@ts-ignore
-      const result = await window.ethereum.request({
-        method: "eth_signWithEddsaPrivKey",
-        params: ["123456789"],
-      });
-      setOraiUserSig(result.result);
-      return result.result;
-    }
-  };
   /**
    * Get challenge from message
    */
@@ -169,35 +154,18 @@ const Attestation = () => {
           const parsedValue = requirement.value.map((item: any) =>
             BigInt(item)
           );
-          if (checkUserType() === userType.oraiWeb) {
-            const returnDataFromSign = JSON.parse(oraiUserSig);
-            const originalSignature = {
-              R8: returnDataFromSign.signature.R8.map((partOfSig: any) => {
-                return window.zidenParams.F.toObject(
-                  Uint8Array.from(Buffer.from(partOfSig, "hex"))
-                );
-              }),
-              S: returnDataFromSign.signature.S,
-            };
-            const signMessage = BigInt(returnDataFromSign.message);
-            sig = {
-              challengeSignatureR8x: originalSignature.R8[0],
-              challengeSignatureR8y: originalSignature.R8[1],
-              challengeSignatureS: originalSignature.S,
-              challenge: signMessage,
-            } as SignedChallenge;
-          } else {
-            const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
-            const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
+          
+          const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
+          const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
 
-            const signature = await auth.signChallenge(privateKey, challenge);
-            sig = {
-              challengeSignatureR8x: signature.challengeSignatureR8x,
-              challengeSignatureR8y: signature.challengeSignatureR8y,
-              challengeSignatureS: signature.challengeSignatureS,
-              challenge: challenge,
-            } as SignedChallenge;
-          }
+          const signature = await auth.signChallenge(privateKey, challenge);
+          sig = {
+            challengeSignatureR8x: signature.challengeSignatureR8x,
+            challengeSignatureR8y: signature.challengeSignatureR8y,
+            challengeSignatureS: signature.challengeSignatureS,
+            challenge: challenge,
+          } as SignedChallenge;
+          
           const query: Query = {
             slotIndex: slotData?.slot || 0,
             operator: requirement.operator,
@@ -239,7 +207,7 @@ const Attestation = () => {
         }
       }
     },
-    [checkUserType, keyContainer, isUnlocked, oraiUserSig, requestData, userId]
+    [keyContainer, isUnlocked, requestData, userId]
   );
 
   const handleConfirm = React.useCallback(async () => {
@@ -290,24 +258,14 @@ const Attestation = () => {
    */
   useEffect(() => {
     const actionOnStatus = async () => {
-      if (checkUserType() === userType.oraiWeb) {
-        if (
-          geningProofStatus === AttestStatus.Executing &&
-          !isSigning &&
-          oraiUserSig
-        ) {
-          setOpen(true);
-          await handleConfirm();
-        }
-      } else {
-        if (geningProofStatus === AttestStatus.Executing) {
-          setOpen(true);
-          await handleConfirm();
-        }
+      if (geningProofStatus === AttestStatus.Executing) {
+        setOpen(true);
+        await handleConfirm();
       }
+      
     };
     actionOnStatus();
-  }, [isSigning, oraiUserSig, geningProofStatus, checkUserType, handleConfirm]);
+  }, [isSigning, geningProofStatus, checkUserType, handleConfirm]);
 
   /**
    * redirect user to request page with appropriate schema
@@ -585,15 +543,7 @@ const Attestation = () => {
   const handleClick = async () => {
     try {
       setVerifyStatus(AttestStatus.Pending);
-      if (checkUserType() === userType.oraiWeb) {
-        setGeningProofStatus(AttestStatus.Executing);
-        seIsSigning(true);
-        getUserSig();
-        seIsSigning(false);
-        setOraiUserSig("");
-      } else {
-        setGeningProofStatus(AttestStatus.Executing);
-      }
+      setGeningProofStatus(AttestStatus.Executing);
     } catch (err) {
       setGeningProofStatus(AttestStatus.Fail);
     }

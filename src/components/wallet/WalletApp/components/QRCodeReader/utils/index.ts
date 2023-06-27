@@ -113,9 +113,6 @@ const handleQRClaim = async (
     const dataEncrypted = keyContainer.encryptWithDataKey(saveData);
     const localDB = keyContainer.db;
     localDB.insert(`ziden-user-claims/${claimData?.claimId}`, dataEncrypted);
-    if (checkUserType() === userType.oraiWeb) {
-      return;
-    }
     const backupKeys = keyContainer.generateKeyForBackup();
     let dek = await checkForDek();
     if (!dek) {

@@ -373,6 +373,5 @@ export const Occupation = [
 ];
 export const userType = {
   mobile: "MOBILE",
-  web: "WEB",
-  oraiWeb: "ORAI-WEB",
+  web: "WEB"
 };

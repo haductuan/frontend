@@ -94,78 +94,40 @@ const Register = () => {
       setLoading(true);
       try {
         //@ts-ignore
-        if (checkUserType() !== userType.oraiWeb) {
-          const privateKey = keyContainer.getKeyDecrypted().privateKey;
-          const privateKeyBuff = zidenjsUtils.hexToBuffer(privateKey, 32);
-          const pubkeyX = window.zidenParams.F.toObject(
-            window.zidenParams.eddsa.prv2pub(privateKeyBuff)[0]
-          );
-          const pubkeyY = window.zidenParams.F.toObject(
-            window.zidenParams.eddsa.prv2pub(privateKeyBuff)[1]
-          );
-          const res = await axios.post(
-            `${
-              endpointUrl
-                ? endpointUrl
-                : "https://issuer-staging.ziden.io/api/v1"
-            }/issuers/register`,
-            {
-              // userId: userID,
-              pubkeyX: pubkeyX.toString(10),
-              pubkeyY: pubkeyY.toString(10),
-            }
-          );
-          if (res.data) {
-            await handlePostIssuerInformation();
-            enqueueSnackbar("Register success!", {
-              variant: "success",
-            });
-            history.push("/issuer/profile");
-          } else {
-            enqueueSnackbar("Register failed!", {
-              autoHideDuration: 1000,
-              variant: "error",
-            });
+      
+        const privateKey = keyContainer.getKeyDecrypted().privateKey;
+        const privateKeyBuff = zidenjsUtils.hexToBuffer(privateKey, 32);
+        const pubkeyX = window.zidenParams.F.toObject(
+          window.zidenParams.eddsa.prv2pub(privateKeyBuff)[0]
+        );
+        const pubkeyY = window.zidenParams.F.toObject(
+          window.zidenParams.eddsa.prv2pub(privateKeyBuff)[1]
+        );
+        const res = await axios.post(
+          `${
+            endpointUrl
+              ? endpointUrl
+              : "https://issuer-staging.ziden.io/api/v1"
+          }/issuers/register`,
+          {
+            // userId: userID,
+            pubkeyX: pubkeyX.toString(10),
+            pubkeyY: pubkeyY.toString(10),
           }
-        } else {
-          //@ts-ignore
-          const result = await window.ethereum.request({
-            method: "eth_signWithEddsaPrivKey",
-            params: ["123456789"],
+        );
+        if (res.data) {
+          await handlePostIssuerInformation();
+          enqueueSnackbar("Register success!", {
+            variant: "success",
           });
-          const publicKey = JSON.parse(result.result).pub_key.map(
-            (partOfKey: any) => {
-              return window.zidenParams.F.toObject(
-                Uint8Array.from(Buffer.from(partOfKey, "hex"))
-              );
-            }
-          );
-          const res = await axios.post(
-            `${
-              endpointUrl
-                ? endpointUrl
-                : "https://issuer-staging.ziden.io/api/v1"
-            }/issuers/register`,
-            {
-              // userId: userID,
-              pubkeyX: publicKey[0].toString(10),
-              pubkeyY: publicKey[1].toString(10),
-            }
-          );
-          if (res.data) {
-            await handlePostIssuerInformation();
-            enqueueSnackbar("Register success!", {
-              autoHideDuration: 1000,
-              variant: "success",
-            });
-            history.push("/issuer/profile");
-          } else {
-            enqueueSnackbar("Register failed!", {
-              autoHideDuration: 1000,
-              variant: "error",
-            });
-          }
+          history.push("/issuer/profile");
+        } else {
+          enqueueSnackbar("Register failed!", {
+            autoHideDuration: 1000,
+            variant: "error",
+          });
         }
+        
         setLoading(false);
       } catch (err) {
         enqueueSnackbar("Register failed!", {

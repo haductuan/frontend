@@ -275,7 +275,7 @@ export default class KeyContainer {
     this.generateDataKey();
   };
   /**
-   * generate auth claim from public key (for orai wallet user)
+   * generate auth claim from public key
    * @param publicKey
    */
   generateZidenKeyFromPublicKey = async (publicKey: Array<any>) => {

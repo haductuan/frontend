@@ -145,13 +145,6 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
     ) {
       return userType.web;
     }
-    if (
-      !localStorage.getItem("ziden-db/ziden-privateKeyEncrypted") &&
-      !localStorage.getItem("mobile-private-key") &&
-      !localStorage.getItem("mobile-hash-passcode")
-    ) {
-      return userType.oraiWeb;
-    }
     return null;
   }, []);
   const checkForDek = React.useCallback(async () => {
@@ -165,102 +158,101 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
   }, [getZidenUserID]);
 
   const backup = React.useCallback(async () => {
-    if (checkUserType() !== userType.oraiWeb) {
-      const userId = await getZidenUserID();
-      const libsodium = keyContainer.getCryptoUtil();
-      const keys = keyContainer.generateKeyForBackup();
-      //get encryption key (dek)
-      let dek = await checkForDek();
-      if (!dek) {
-        //dek not exist
-        dek = keyContainer.generateDekForBackup();
-        const dekEncode = libsodium.crypto_box_seal(
-          dek,
-          libsodium.from_hex(keys?.publicKey),
-          "hex"
-        );
-        //post to server
-        await zidenBackup.post("/holder", {
-          holderId: userId,
-          dek: dekEncode,
-        });
-      } else {
-        // dek exist:
-        //decode dek
-        dek = libsodium.crypto_box_seal_open(
-          libsodium.from_hex(dek),
-          libsodium.from_hex(keys.publicKey),
-          libsodium.from_hex(keys.privateKey),
-          "text"
-        );
-      }
-      const allClaims = getAllUserClaim();
-      if (allClaims.length === 0) {
-        enqueueSnackbar("You have no claims to backup!", {
-          autoHideDuration: 1000,
-          variant: "info",
-        });
-        return;
-      }
-      const allClaimDecrypted = allClaims.map((item) => {
-        const dataDecrypted = keyContainer.decryptWithDataKey(
-          item.claimEncrypted
-        );
-        return {
-          id: item.id,
-          claim: JSON.parse(dataDecrypted).claim,
-          issuerID: JSON.parse(dataDecrypted).issuerID,
-          schemaHash: JSON.parse(dataDecrypted).schemaHash,
-        };
+    
+    const userId = await getZidenUserID();
+    const libsodium = keyContainer.getCryptoUtil();
+    const keys = keyContainer.generateKeyForBackup();
+    //get encryption key (dek)
+    let dek = await checkForDek();
+    if (!dek) {
+      //dek not exist
+      dek = keyContainer.generateDekForBackup();
+      const dekEncode = libsodium.crypto_box_seal(
+        dek,
+        libsodium.from_hex(keys?.publicKey),
+        "hex"
+      );
+      //post to server
+      await zidenBackup.post("/holder", {
+        holderId: userId,
+        dek: dekEncode,
       });
-      const allClaimBackedup = allClaimDecrypted.map((claimData: any) => {
-        const id = claimData.id;
-        const issuerId = claimData.issuerID;
-        const nonce = libsodium.randombytes_buf(
-          libsodium.crypto_box_NONCEBYTES,
-          "hex"
-        );
-        const dataEncode = libsodium.crypto_secretbox_easy(
-          JSON.stringify(claimData),
-          libsodium.from_hex(nonce),
-          libsodium.from_hex(dek),
-          "hex"
-        );
-        return zidenBackup.post("backup?type=ZIDEN", {
-          holderId: userId,
-          issuerId: issuerId,
-          claimId: id,
-          data: dataEncode,
-          nonce: nonce,
-        });
-      });
-      Promise.allSettled(allClaimBackedup).then((res) => {
-        let fail = 0;
-        for (let i = 0; i < res.length; i++) {
-          if (res[i].status === "fulfilled") {
-            continue;
-          } else {
-            fail += 1;
-          }
-        }
-        if (fail === 0) {
-          enqueueSnackbar("Backup success!", {
-            variant: "success",
-          });
-          setOpen(false);
-        } else {
-          enqueueSnackbar(`Backup failed ${fail} claims`, {
-            variant: "error",
-          });
-        }
-      });
+    } else {
+      // dek exist:
+      //decode dek
+      dek = libsodium.crypto_box_seal_open(
+        libsodium.from_hex(dek),
+        libsodium.from_hex(keys.publicKey),
+        libsodium.from_hex(keys.privateKey),
+        "text"
+      );
     }
+    const allClaims = getAllUserClaim();
+    if (allClaims.length === 0) {
+      enqueueSnackbar("You have no claims to backup!", {
+        autoHideDuration: 1000,
+        variant: "info",
+      });
+      return;
+    }
+    const allClaimDecrypted = allClaims.map((item) => {
+      const dataDecrypted = keyContainer.decryptWithDataKey(
+        item.claimEncrypted
+      );
+      return {
+        id: item.id,
+        claim: JSON.parse(dataDecrypted).claim,
+        issuerID: JSON.parse(dataDecrypted).issuerID,
+        schemaHash: JSON.parse(dataDecrypted).schemaHash,
+      };
+    });
+    const allClaimBackedup = allClaimDecrypted.map((claimData: any) => {
+      const id = claimData.id;
+      const issuerId = claimData.issuerID;
+      const nonce = libsodium.randombytes_buf(
+        libsodium.crypto_box_NONCEBYTES,
+        "hex"
+      );
+      const dataEncode = libsodium.crypto_secretbox_easy(
+        JSON.stringify(claimData),
+        libsodium.from_hex(nonce),
+        libsodium.from_hex(dek),
+        "hex"
+      );
+      return zidenBackup.post("backup?type=ZIDEN", {
+        holderId: userId,
+        issuerId: issuerId,
+        claimId: id,
+        data: dataEncode,
+        nonce: nonce,
+      });
+    });
+    Promise.allSettled(allClaimBackedup).then((res) => {
+      let fail = 0;
+      for (let i = 0; i < res.length; i++) {
+        if (res[i].status === "fulfilled") {
+          continue;
+        } else {
+          fail += 1;
+        }
+      }
+      if (fail === 0) {
+        enqueueSnackbar("Backup success!", {
+          variant: "success",
+        });
+        setOpen(false);
+      } else {
+        enqueueSnackbar(`Backup failed ${fail} claims`, {
+          variant: "error",
+        });
+      }
+    });
+    
   }, [
     checkForDek,
     keyContainer,
     enqueueSnackbar,
     getZidenUserID,
-    checkUserType,
   ]);
 
   const IdWalletContextData = useMemo(

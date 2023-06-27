@@ -47,13 +47,11 @@ const Await = () => {
         const allClaims = (await zidenPortal.get(`claims?holderId=${userId}`))
           ?.data;
         let OndeviceClaimId: Array<any> = [];
-        if (checkUserType() === userType.oraiWeb) {
-          OndeviceClaimId = getAllUserClaim().map((claim) => claim.id);
-        } else {
-          OndeviceClaimId = allUserClaimData.data?.data?.map(
-            (item: any) => item.claimId
-          );
-        }
+        
+        OndeviceClaimId = allUserClaimData.data?.data?.map(
+          (item: any) => item.claimId
+        );
+        
         const awatingClaims = allClaims?.filter((claim: any) => {
           return !OndeviceClaimId.includes(claim.claimId);
         });

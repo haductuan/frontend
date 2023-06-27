@@ -192,42 +192,21 @@ const Revocation = (props: any) => {
           return;
         }
         let sig;
-        if (checkUserType() === userType.oraiWeb) {
-          //@ts-ignore
-          const result = await window.ethereum.request({
-            method: "eth_signWithEddsaPrivKey",
-            params: [challenge],
-          });
-          const returnDataFromSign = JSON.parse(result.result);
-          const originalSignature = {
-            R8: returnDataFromSign.signature.R8.map((partOfSig: any) => {
-              return window.zidenParams.F.toObject(
-                Uint8Array.from(Buffer.from(partOfSig, "hex"))
-              );
-            }),
-            S: returnDataFromSign.signature.S,
-          };
-          sig = {
-            challengeSignatureR8x: originalSignature.R8[0].toString(),
-            challengeSignatureR8y: originalSignature.R8[1].toString(),
-            challengeSignatureS: originalSignature.S,
-            challenge: challenge,
-          };
-        } else {
-          const challengeBigint = BigInt(challenge);
-          const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
-          const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
-          const signature = await auth.signChallenge(
-            privateKey,
-            challengeBigint
-          );
-          sig = {
-            challenge: challenge,
-            challengeSignatureR8x: signature.challengeSignatureR8x.toString(),
-            challengeSignatureR8y: signature.challengeSignatureR8y.toString(),
-            challengeSignatureS: signature.challengeSignatureS.toString(),
-          };
-        }
+        
+        const challengeBigint = BigInt(challenge);
+        const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
+        const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
+        const signature = await auth.signChallenge(
+          privateKey,
+          challengeBigint
+        );
+        sig = {
+          challenge: challenge,
+          challengeSignatureR8x: signature.challengeSignatureR8x.toString(),
+          challengeSignatureR8y: signature.challengeSignatureR8y.toString(),
+          challengeSignatureS: signature.challengeSignatureS.toString(),
+        };
+        
         const resultPublish = await axios.post(
           `${endpointUrl}/claims/revoke/${userId}`,
           {

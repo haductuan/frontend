@@ -55,14 +55,8 @@ const IdentityDetail = ({
       const localDB = keyContainer.db;
       //save to local storage
       localDB.insert(`ziden-user-claims/${data?.id}`, dataEncrypted);
+      
       //auto backup
-      //@ts-ignore
-      //if using orai wallet: not backup
-      if (checkUserType() === userType.oraiWeb) {
-        setLoading(false);
-        setRefresh((prev: any) => prev + 1);
-        return;
-      }
       const backupKeys = keyContainer.generateKeyForBackup();
       let dek = await checkForDek();
       if (!dek) {

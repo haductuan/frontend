@@ -111,45 +111,20 @@ const SignIn = () => {
         const challenge = "123456789";
         let sig: any;
         //@ts-ignore
-        if (checkUserType() === userType.oraiWeb) {
-          try {
-            //@ts-ignore
-            const result = await window.ethereum.request({
-              method: "eth_signWithEddsaPrivKey",
-              params: [challenge],
-            });
-            const returnDataFromSign = JSON.parse(result.result);
-            const originalSignature = {
-              R8: returnDataFromSign.signature.R8.map((partOfSig: any) => {
-                return window.zidenParams.F.toObject(
-                  Uint8Array.from(Buffer.from(partOfSig, "hex"))
-                );
-              }),
-              S: returnDataFromSign.signature.S,
-            };
-            const signMessage = BigInt(returnDataFromSign.message);
-            sig = {
-              challengeSignatureR8x: originalSignature.R8[0],
-              challengeSignatureR8y: originalSignature.R8[1],
-              challengeSignatureS: originalSignature.S,
-              challenge: signMessage,
-            } as SignedChallenge;
-          } catch (err) {}
-        } else {
-          const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
-          const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
-          const challengeBigint = BigInt(challenge);
-          const signature = await auth.signChallenge(
-            privateKey,
-            challengeBigint
-          );
-          sig = {
-            challenge: challengeBigint,
-            challengeSignatureR8x: signature.challengeSignatureR8x,
-            challengeSignatureR8y: signature.challengeSignatureR8y,
-            challengeSignatureS: signature.challengeSignatureS,
-          } as SignedChallenge;
-        }
+        const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
+        const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
+        const challengeBigint = BigInt(challenge);
+        const signature = await auth.signChallenge(
+          privateKey,
+          challengeBigint
+        );
+        sig = {
+          challenge: challengeBigint,
+          challengeSignatureR8x: signature.challengeSignatureR8x,
+          challengeSignatureR8y: signature.challengeSignatureR8y,
+          challengeSignatureS: signature.challengeSignatureS,
+        } as SignedChallenge;
+        
 
         const query: Query = {
           slotIndex: 6,
