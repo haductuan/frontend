@@ -1,0 +1,16 @@
+declare function createBase64ImageFromIntArray(_0x139517: any): string;
+declare var _0x12e5: string[];
+declare function _0x328b(_0x2ee396: any, _0x1445e3: any): string;
+declare function _0x3a7141(_0x2ee396: any, _0x1445e3: any): string;
+declare var _0x2b46d6: typeof _0x2b46d6;
+declare var Module: typeof _0x2b46d6;
+declare var moduleInitialized: boolean;
+declare var preloadComplete: boolean;
+declare var initializationErrorThrown: boolean;
+declare var versionString: string;
+declare var workerUrl: string;
+declare var _0x3bf2b2: {};
+declare var showDebugData: boolean;
+declare var averageProcessTime: number;
+declare var totalProcesstime: number;
+declare var processCount: number;
