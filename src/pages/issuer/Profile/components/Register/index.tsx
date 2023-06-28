@@ -40,7 +40,7 @@ const Register = () => {
   const [contact, setContact] = useState<string>("");
   const [contactHt, setContactHt] = useState<string>(" ");
   const [logoPreview, setLogoPreview] = useState<any>();
-  const { isUnlocked, getZidenUserID, keyContainer, checkUserType } =
+  const { isUnlocked, getZidenUserID, keyContainer } =
     useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
 

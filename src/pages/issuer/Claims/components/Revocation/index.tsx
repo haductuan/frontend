@@ -40,7 +40,7 @@ const Revocation = (props: any) => {
   const jwz = localStorage.getItem("ziden-db/issuer-jwz");
   //context
   const { endpointUrl, issuerID } = useIssuerContext();
-  const { keyContainer, isUnlocked, userId, checkUserType } =
+  const { keyContainer, isUnlocked, userId } =
     useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   // state

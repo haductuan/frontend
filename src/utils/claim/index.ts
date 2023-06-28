@@ -77,7 +77,6 @@ export const generateProof = async (witness: any) => {
     )
   );
   try {
-    //checkUserType
     const { proof, publicSignals } =
       // @ts-ignore
       await window.snarkjs.groth16.fullProve(

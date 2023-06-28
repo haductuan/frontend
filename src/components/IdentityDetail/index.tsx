@@ -36,7 +36,7 @@ const IdentityDetail = ({
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { keyContainer, getZidenUserID, checkUserType, checkForDek } =
+  const { keyContainer, getZidenUserID, checkForDek } =
     useIdWalletContext();
 
   const handleClaim = async () => {

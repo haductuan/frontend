@@ -47,7 +47,7 @@ const selectorStyle = (theme: Theme) => ({
 });
 
 const SignIn = () => {
-  const { isUnlocked, setOpen, getZidenUserID, keyContainer, checkUserType } =
+  const { isUnlocked, setOpen, getZidenUserID, keyContainer } =
     useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   const [issuer, serIssuer] = useState<any>({});

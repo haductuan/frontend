@@ -24,7 +24,7 @@ const Issuance = (props: any) => {
   const jwz = localStorage.getItem("ziden-db/issuer-jwz");
   //context
   const { endpointUrl, issuerID } = useIssuerContext();
-  const { isUnlocked, checkUserType, keyContainer, userId } =
+  const { isUnlocked, keyContainer, userId } =
     useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   //state

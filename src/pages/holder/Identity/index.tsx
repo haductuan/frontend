@@ -117,7 +117,7 @@ const Identity = () => {
       });
     }
     
-  }, [keyContainer, getZidenUserID, checkForDek, checkUserType]);
+  }, [keyContainer, getZidenUserID, checkForDek]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setTab(newValue);

@@ -70,7 +70,6 @@ const Requestv2 = () => {
     isUnlocked,
     keyContainer,
     getZidenUserID,
-    checkUserType,
     checkForDek,
   } = useIdWalletContext();
   const params: any = useParams();
