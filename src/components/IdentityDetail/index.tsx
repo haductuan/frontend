@@ -7,7 +7,6 @@ import { getStatusColor } from "src/pages/holder/Identity/components/OnDevice";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { zidenBackup } from "src/client/api";
 import { LoadingButton } from "@mui/lab";
-import { userType } from "src/constants";
 import { parseLabel } from "src/utils/claim";
 
 const capitalizeFirstLetter = (string: string) => {
@@ -56,7 +55,7 @@ const IdentityDetail = ({
       //save to local storage
       localDB.insert(`ziden-user-claims/${data?.id}`, dataEncrypted);
       
-      //auto backup
+      // auto backup
       const backupKeys = keyContainer.generateKeyForBackup();
       let dek = await checkForDek();
       if (!dek) {

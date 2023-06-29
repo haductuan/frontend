@@ -9,7 +9,6 @@ import axios from "axios";
 import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import Await from "./components/Await";
-import { userType } from "src/constants";
 
 const Identity = () => {
   const [tab, setTab] = useState<number>(0);
@@ -19,7 +18,6 @@ const Identity = () => {
     keyContainer,
     getZidenUserID,
     isUnlocked,
-    checkUserType,
     checkForDek,
   } = useIdWalletContext();
 

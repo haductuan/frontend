@@ -24,6 +24,7 @@ import {
   CLAIM_REV_NONCE_DB_PATH,
   NO_PRIVATEKEY_MESSAGE,
 } from "./config";
+import { zidenIssuer } from "src/client/api";
 
 //generate key
 const hdkey = require("hdkey");
@@ -262,17 +263,60 @@ export default class KeyContainer {
     const authClaim = await auth.newAuthFromPrivateKey(privateKeyBuff);
     await this.generateUserTree(authClaim);
     this.generateDataKey();
+
+    // register user to contract
+    try {
+      const userID = this.decryptFromDB("userID");
+      const userResolve = (await zidenIssuer.get(`/did/resolve/${userID}`)).data;
+      if (userResolve.publicKey === "0") {
+        const pubkeyX = window.zidenParams.F.toObject(
+          window.zidenParams.eddsa.prv2pub(privateKeyBuff)[0]
+        ).toString(10);
+        const pubkeyY = window.zidenParams.F.toObject(
+          window.zidenParams.eddsa.prv2pub(privateKeyBuff)[1]
+        ).toString(10);
+        const backupKey = this.generateKeyForBackup();
+        await zidenIssuer.post("/did", {
+          userId: userID,
+          pubkeyX: pubkeyX,
+          pubkeyY: pubkeyY,
+          publicKey: backupKey.publicKey
+        });
+      }
+    } catch (err) {
+    }
   };
   /**
    * generate private key and build user tree from private key
    * @param privateKey
    */
   generateZidenKeyFromPrivateKey = async (privateKey: string) => {
+    
     const privateKeyBuff = zidenjsUtils.hexToBuffer(privateKey, 32);
     this.db.insert("ziden-privateKeyEncrypted", this.encrypt(privateKey));
     const authClaim = await auth.newAuthFromPrivateKey(privateKeyBuff);
     await this.generateUserTree(authClaim);
     this.generateDataKey();
+    try {
+      const userID = this.decryptFromDB("userID");
+      const userResolve = (await zidenIssuer.get(`/did/resolve/${userID}`)).data;
+      if (userResolve.publicKey === "0") {
+        const pubkeyX = window.zidenParams.F.toObject(
+          window.zidenParams.eddsa.prv2pub(privateKeyBuff)[0]
+        ).toString(10);
+        const pubkeyY = window.zidenParams.F.toObject(
+          window.zidenParams.eddsa.prv2pub(privateKeyBuff)[1]
+        ).toString(10);
+        const backupKey = this.generateKeyForBackup();
+        await zidenIssuer.post("/did", {
+          userId: userID,
+          pubkeyX: pubkeyX,
+          pubkeyY: pubkeyY,
+          publicKey: backupKey.publicKey
+        });
+      }
+    } catch (err) {
+    }
   };
   /**
    * generate auth claim from public key
