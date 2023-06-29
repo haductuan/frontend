@@ -206,6 +206,7 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
         schemaHash: JSON.parse(dataDecrypted).schemaHash,
       };
     });
+        
     const allClaimBackedup = allClaimDecrypted.map((claimData: any) => {
       const id = claimData.id;
       const issuerId = claimData.issuerID;

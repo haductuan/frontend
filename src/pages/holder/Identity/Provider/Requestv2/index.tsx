@@ -144,6 +144,7 @@ const Requestv2 = () => {
       };
     });
   };
+
   //send request data to server and receive claim
   const handleConfirm = async () => {
     if (isUnlocked) {
@@ -164,37 +165,26 @@ const Requestv2 = () => {
         setLoading(true);
         const libsodium = keyContainer.getCryptoUtil();
         const userID = await getZidenUserID();
-        const keys = keyContainer.generateHexKeyForClaim();
-        const privateKey = keys?.privateKey;
-        const publicKey = keys?.publicKey;
+
         const result = await zidenIssuerNew.post(
           `/claims/request/${metaData?.issuer?.issuerId}`,
           {
             holderId: userID,
             registryId: params.requestID,
-            publicKey: publicKey,
             data: formData,
           }
-        );
-        const serverPublicKey = result.data.serverPublicKey;
-        var decrypted = libsodium.crypto_box_open_easy(
-          libsodium.from_hex(result.data?.encodeClaim),
-          libsodium.from_hex(result.data?.nonce),
-          libsodium.from_hex(serverPublicKey),
-          libsodium.from_hex(privateKey),
-          "text"
-        );
-        console.log(
-          "🚀 ~ file: index.tsx:188 ~ handleConfirm ~ decrypted:",
-          JSON.parse(decrypted)
         );
 
         const data = JSON.stringify({
           claimId: result.data?.claimId,
-          claim: decrypted,
+          claim: JSON.stringify({
+            rawData: result.data?.rawData,
+            claim: result.data?.claim
+          }),
           schemaHash: metaData.schema?.schemaHash,
           issuerID: metaData.issuer.issuerId,
         });
+
         const dataEncrypted = keyContainer.encryptWithDataKey(data);
         const localDB = keyContainer.db;
         if (localStorage.getItem("mobile-private-key")) {
@@ -214,6 +204,7 @@ const Requestv2 = () => {
           `ziden-user-claims/${result.data.claimId}`,
           dataEncrypted
         );
+
         if (result?.data?.data?.error) {
           enqueueSnackbar("Get claim failed!", {
             variant: "error",

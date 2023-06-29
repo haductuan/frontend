@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import { getAllUserClaim } from "src/utils/db/localStorageDb";
 
 interface changePasswordProps {
   setPage: any;
@@ -67,14 +68,14 @@ const ChangePassword = ({ setPage }: changePasswordProps) => {
       //   "🚀 ~ file: UserAccount.tsx:82 ~ handleSubmitButton ~ dataKey",
       //   dataKey
       // );
-      // const allClaimDecrypted = getAllUserClaim().map((claim, index) => {
-      //   return {
-      //     id: claim.id,
-      //     claimDecrypted: keyContainer.decryptFromDB(
-      //       `ziden-user-claims/${claim.id}`
-      //     ),
-      //   };
-      // });
+      const allClaimDecrypted = getAllUserClaim().map((claim, index) => {
+        return {
+          id: claim.id,
+          claimDecrypted: keyContainer.decryptFromDB(
+            `ziden-user-claims/${claim.id}`
+          ),
+        };
+      });
       // console.log(
       //   "🚀 ~ file: UserAccount.tsx ~ line 88 ~ allClaimDecrypted ~ allClaimDecrypted",
       //   allClaimDecrypted

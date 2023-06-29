@@ -1,5 +1,4 @@
 import { zidenBackup, zidenPortal } from "src/client/api";
-import { userType } from "src/constants";
 import KeyContainer from "src/utils/key-container/keyContainer";
 
 /**
@@ -113,6 +112,7 @@ const handleQRClaim = async (
     const dataEncrypted = keyContainer.encryptWithDataKey(saveData);
     const localDB = keyContainer.db;
     localDB.insert(`ziden-user-claims/${claimData?.claimId}`, dataEncrypted);
+    
     const backupKeys = keyContainer.generateKeyForBackup();
     let dek = await checkForDek();
     if (!dek) {

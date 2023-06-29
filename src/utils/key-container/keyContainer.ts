@@ -358,21 +358,21 @@ export default class KeyContainer {
         privateKey,
       }
    */
-  generateHexKeyForClaim = () => {
-    if (sodium) {
-      const {
-        publicKey,
-        privateKey,
-      }: { publicKey: string; privateKey: string } =
-        sodium.crypto_box_keypair("hex");
-      return {
-        publicKey,
-        privateKey,
-      };
-    } else {
-      return null;
-    }
-  };
+  // generateHexKeyForClaim = () => {
+  //   if (sodium) {
+  //     const {
+  //       publicKey,
+  //       privateKey,
+  //     }: { publicKey: string; privateKey: string } =
+  //       sodium.crypto_box_keypair("hex");
+  //     return {
+  //       publicKey,
+  //       privateKey,
+  //     };
+  //   } else {
+  //     return null;
+  //   }
+  // };
   getCryptoUtil = () => {
     if (sodium) {
       return sodium;

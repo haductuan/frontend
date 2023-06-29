@@ -53,34 +53,25 @@ const Summary = () => {
     try {
       const libsodium = keyContainer.getCryptoUtil();
       const userID = await getZidenUserID();
-      const keys = keyContainer.generateHexKeyForClaim();
-      const privateKey = keys?.privateKey;
-      const publicKey = keys?.publicKey;
       const result = await zidenIssuerNew.post(
         `/claims/request/${metaData?.issuerId}`,
         {
           holderId: userID,
           registryId: params.requestID,
-          publicKey: publicKey,
           data: userData,
         }
       );
 
-      const serverPublicKey = result.data.serverPublicKey;
-      var decrypted = libsodium.crypto_box_open_easy(
-        libsodium.from_hex(result.data?.encodeClaim),
-        libsodium.from_hex(result.data?.nonce),
-        libsodium.from_hex(serverPublicKey),
-        libsodium.from_hex(privateKey),
-        "text"
-      );
-
       const data = JSON.stringify({
         claimId: result.data?.claimId,
-        claim: decrypted,
+        claim: JSON.stringify({
+          rawData: result.data?.rawData,
+          claim: result.data?.claim
+        }),
         schemaHash: metaData?.schemaHash,
         issuerID: metaData?.issuerId,
       });
+
       await zidenKYC.post("profile", {
         id: kycUserId,
         name: userData.name,
