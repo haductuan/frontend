@@ -134,6 +134,9 @@ const OnDevice = ({ refresh }: { refresh?: number }) => {
         })
         .filter((item) => item);
       const resutMetaData = await zidenPortal.get(`/claims?holderId=${userId}`);
+
+      console.log(resutMetaData.data);
+      
       const claimMetaData = allClaimDecrypted
         .map((item: any, index: number) => {
           try {

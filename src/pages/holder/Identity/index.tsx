@@ -145,7 +145,7 @@ const Identity = () => {
           },
         }}
       >
-        <Tabs
+        {/* <Tabs
           variant="fullWidth"
           value={tab}
           onChange={handleChange}
@@ -176,9 +176,9 @@ const Identity = () => {
         >
           <Tab label="On Device" />
           <Tab label="Await" />
-        </Tabs>
+        </Tabs> */}
         {tab === 0 && <OnDevice refresh={refresh} />}
-        {tab === 1 && <Await />}
+        {/* {tab === 1 && <Await />} */}
       </Box>
     </Box>
   );

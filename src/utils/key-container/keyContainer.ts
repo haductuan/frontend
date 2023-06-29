@@ -33,9 +33,11 @@ const pbkdf2 = require("pbkdf2");
 const authDb = new zidenjsDb.SMTLevelDb(
   `${ZIDEN_LEVEL_DB_PATH}/${AUTH_LVLDB_PATH}`
 );
+
 const claimsDb = new zidenjsDb.SMTLevelDb(
   `${ZIDEN_LEVEL_DB_PATH}/${CLAIM_LVLDB_PATH}`
 );
+
 const claimsRevDb = new zidenjsDb.SMTLevelDb(
   `${ZIDEN_LEVEL_DB_PATH}/${CLAIM_REV_LVLDB_PATH}`
 );
@@ -354,9 +356,9 @@ export default class KeyContainer {
   /**
    * generate hex key pair for encrypt - decrypt claim from server
    * @return {
-        publicKey,
-        privateKey,
-      }
+   *     publicKey,
+   *    privateKey,
+   *  }
    */
   // generateHexKeyForClaim = () => {
   //   if (sodium) {
