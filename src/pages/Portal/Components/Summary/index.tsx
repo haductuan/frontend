@@ -5,7 +5,7 @@ import { usePortalContext } from "src/context/PortalContext";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { zidenBackend, zidenBackup } from "src/client/api";
+import { zidenBackend } from "src/client/api";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { displayTitle } from "src/context/PortalContext";
@@ -16,7 +16,7 @@ const Summary = () => {
     usePortalContext();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { isUnlocked, getZidenUserID, keyContainer, checkForDek } =
+  const { isUnlocked, getZidenUserID, keyContainer } =
     useIdWalletContext();
   const params: any = useParams();
 
@@ -137,53 +137,7 @@ const Summary = () => {
     );
     //backup data
     const backupKeys = keyContainer.generateKeyForBackup();
-    let dek = await checkForDek();
-    if (!dek) {
-      //dek not exist
-      //generate dek
-      dek = keyContainer.generateDekForBackup();
-      const dekEncode = libsodium.crypto_box_seal(
-        dek,
-        libsodium.from_hex(backupKeys.publicKey),
-        "hex"
-      );
-      //post to server
-      await zidenBackup.post("/holder", {
-        holderId: userID,
-        dek: dekEncode,
-      });
-    } else {
-      // dek exist:
-      //get dek from server and decode dek
-      dek = libsodium.crypto_box_seal_open(
-        libsodium.from_hex(dek),
-        libsodium.from_hex(backupKeys.publicKey),
-        libsodium.from_hex(backupKeys.privateKey),
-        "text"
-      );
-    }
-    const backupNonce = libsodium.randombytes_buf(
-      libsodium.crypto_box_NONCEBYTES,
-      "hex"
-    );
-    const dataEncode = libsodium.crypto_secretbox_easy(
-      JSON.stringify({
-        id: result.data.data.claimId,
-        claim: JSON.parse(data).claim,
-        issuerID: resgistryData.issuerID,
-        schemaHash: JSON.parse(data).schemaHash,
-      }),
-      libsodium.from_hex(backupNonce),
-      libsodium.from_hex(dek),
-      "hex"
-    );
-    await zidenBackup.post("backup?type=ZIDEN", {
-      holderId: userID,
-      issuerId: resgistryData.issuerID,
-      claimId: result.data.data.claimId,
-      data: dataEncode,
-      nonce: backupNonce,
-    });
+
   };
 
   return (

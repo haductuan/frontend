@@ -13,7 +13,6 @@ const QRCodeReader = ({ exitQRReader }: { exitQRReader: () => void }) => {
     keyContainer,
     userId,
     checkUserType,
-    checkForDek,
     qrCodeData,
     setQrCodeData,
   } = useIdWalletContext();
@@ -79,7 +78,6 @@ const QRCodeReader = ({ exitQRReader }: { exitQRReader: () => void }) => {
           keyContainer,
           userId,
           checkUserType,
-          checkForDek,
           qrCodeData,
           setQrCodeData
         );
@@ -102,7 +100,6 @@ const QRCodeReader = ({ exitQRReader }: { exitQRReader: () => void }) => {
       keyContainer,
       userId,
       checkUserType,
-      checkForDek,
       qrCodeData,
       setQrCodeData,
     ]

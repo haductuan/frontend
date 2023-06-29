@@ -8,7 +8,7 @@ import { displayTitle } from "src/context/PortalContext";
 import { useKYCContext } from "src/context/kyc-context";
 import { parseLabel } from "src/utils/claim";
 import { LoadingButton } from "@mui/lab";
-import { zidenBackup, zidenIssuerNew, zidenKYC } from "src/client/api";
+import { zidenIssuerNew, zidenKYC } from "src/client/api";
 import { useParams } from "react-router-dom";
 import { userType } from "src/constants";
 
@@ -22,7 +22,6 @@ const Summary = () => {
     keyContainer,
     getZidenUserID,
     checkUserType,
-    checkForDek,
   } = useIdWalletContext();
   const handleBack = () => {
     setActiveStep((prev: number) => prev - 1);
@@ -107,52 +106,6 @@ const Summary = () => {
       //@ts-ignore
       
       const backupKeys = keyContainer.generateKeyForBackup();
-      let dek = await checkForDek();
-      if (!dek) {
-        //dek not exist
-        dek = keyContainer.generateDekForBackup();
-        const dekEncode = libsodium.crypto_box_seal(
-          dek,
-          libsodium.from_hex(backupKeys.publicKey),
-          "hex"
-        );
-        //post to server
-        await zidenBackup.post("/holder", {
-          holderId: userID,
-          dek: dekEncode,
-        });
-      } else {
-        // dek exist:
-        //decode dek
-        dek = libsodium.crypto_box_seal_open(
-          libsodium.from_hex(dek),
-          libsodium.from_hex(backupKeys.publicKey),
-          libsodium.from_hex(backupKeys.privateKey),
-          "text"
-        );
-      }
-      const backupNonce = libsodium.randombytes_buf(
-        libsodium.crypto_box_NONCEBYTES,
-        "hex"
-      );
-      const dataEncode = libsodium.crypto_secretbox_easy(
-        JSON.stringify({
-          id: result.data?.claimId,
-          claim: JSON.parse(data).claim,
-          issuerID: metaData?.issuerId,
-          schemaHash: metaData?.schemaHash,
-        }),
-        libsodium.from_hex(backupNonce),
-        libsodium.from_hex(dek),
-        "hex"
-      );
-      await zidenBackup.post("backup?type=ZIDEN", {
-        holderId: userID,
-        issuerId: metaData?.issuerId,
-        claimId: result.data?.claimId,
-        data: dataEncode,
-        nonce: backupNonce,
-      });
       
     } catch (err: any) {
       throw Error(err.message);

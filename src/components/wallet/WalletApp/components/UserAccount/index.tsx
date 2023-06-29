@@ -14,7 +14,6 @@ import { truncateString } from "src/utils/wallet/walletUtils";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 
 import {
-  BackupIcon,
   ChangePasswordIcon,
   DeleteIcon,
   LogoutIcon,
@@ -26,7 +25,7 @@ import RevealMnemonic from "../RevealMnemonic";
 import { userType } from "src/constants";
 import QRCodeReader from "../QRCodeReader";
 const UserAccount = () => {
-  const { getZidenUserID, setOpen, lockWallet, backup, checkUserType } =
+  const { getZidenUserID, setOpen, lockWallet, checkUserType } =
     useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   const [zidenDID, setZidenDID] = useState<string>("");
@@ -50,11 +49,6 @@ const UserAccount = () => {
     fetch();
   }, [getZidenUserID]);
   const [page, setPage] = useState(0);
-  const handleBackup = async () => {
-    setLoading(true);
-    await backup();
-    setLoading(false);
-  };
 
   const buttonStyle = (theme: any) => {
     return {
@@ -219,28 +213,6 @@ const UserAccount = () => {
                   }}
                 />
                 Change password
-              </Button>
-              <Button
-                sx={buttonStyle}
-                fullWidth
-                onClick={handleBackup}
-                variant="outlined"
-              >
-                <BackupIcon
-                  sx={{
-                    mr: 2,
-                  }}
-                />
-                Back up
-                {loading && (
-                  <CircularProgress
-                    size={"1rem"}
-                    sx={{
-                      ml: "1rem",
-                      mt: "5px",
-                    }}
-                  />
-                )}
               </Button>
               {checkUserType() === userType.web && (
                 <Button

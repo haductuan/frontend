@@ -19,8 +19,6 @@ export interface IdentityWalletContextProps {
   setIsNewUser: React.Dispatch<SetStateAction<boolean>>;
   validatePassword: (password: string) => Promise<boolean | undefined>;
   checkUserType: any;
-  backup: () => Promise<void>;
-  checkForDek: () => Promise<any>;
   qrCodeData: React.Dispatch<SetStateAction<any>>;
   setQrCodeData: any;
 }

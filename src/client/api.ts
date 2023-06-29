@@ -6,8 +6,6 @@ const ISSUER_SERVER_ADDRESS = process.env.REACT_APP_ISSUER_SERVICE;
 
 const VERIFIER_SERVER_ADDRESS = process.env.REACT_APP_VERIFIER_SERVICE;
 
-const ZIDEN_BACKUP_ADDRESS = process.env.REACT_APP_BACKUP_SERVICE;
-
 const ZIDEN_ISSUER = process.env.REACT_APP_ISSUER_SERVICE;
 
 const ZIDEN_KYC_ADDRESS = process.env.REACT_APP_KYC_SERVICE;
@@ -21,9 +19,6 @@ export const zidenIssuer = axios.create({
 });
 export const zidenVerifier = axios.create({
   baseURL: VERIFIER_SERVER_ADDRESS,
-});
-export const zidenBackup = axios.create({
-  baseURL: ZIDEN_BACKUP_ADDRESS,
 });
 export const zidenPortal = axios.create({
   baseURL: ZIDEN_PORTAL_SERVICE,

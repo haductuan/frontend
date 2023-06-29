@@ -216,78 +216,7 @@ export const ExportKeyIcon = (props: any) => {
     </SvgIcon>
   );
 };
-export const BackupIcon = (props: any) => {
-  return (
-    <SvgIcon
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-    >
-      <g id="Group_26" data-name="Group 26" transform="translate(-501 -459)">
-        <g
-          id="Rectangle_29"
-          data-name="Rectangle 29"
-          transform="translate(501 459)"
-          fill="#fff"
-          stroke="#707070"
-          strokeWidth="1"
-          opacity="0"
-        >
-          <rect width="24" height="24" stroke="none" />
-          <rect x="0.5" y="0.5" width="23" height="23" fill="none" />
-        </g>
-        <g id="Group_25" data-name="Group 25" transform="translate(469 290)">
-          <path
-            id="Path_25"
-            data-name="Path 25"
-            d="M50.126,194.543S46,192.862,46,190.789v-4.861L50.126,184l4.126,1.927v4.861C54.252,192.862,50.126,194.543,50.126,194.543Z"
-            transform="translate(-5.811 -5.327)"
-            fill="none"
-            stroke="#114898"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.2"
-          />
-          <rect
-            id="Rectangle_35"
-            data-name="Rectangle 35"
-            width="3.235"
-            height="2.427"
-            transform="translate(42.697 183.385)"
-            fill="none"
-            stroke="#114898"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.2"
-          />
-          <path
-            id="Path_26"
-            data-name="Path 26"
-            d="M52,192.063v-1.032A1.031,1.031,0,0,1,53.031,190h0a1.031,1.031,0,0,1,1.031,1.031v1.032"
-            transform="translate(-8.717 -9.041)"
-            fill="none"
-            stroke="#114898"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.2"
-          />
-          <path
-            id="Path_27"
-            data-name="Path 27"
-            d="M50.5,183.315h1.805a2.321,2.321,0,0,0,2.321-2.321h0a2.321,2.321,0,0,0-2.321-2.321h-.284a4.8,4.8,0,0,0-1-3.471,5.221,5.221,0,0,0-4.131-2.2,5.155,5.155,0,0,0-4.519,2.675,3.35,3.35,0,0,0-5.279,2.741c0,.087.007.172.013.258h-.787A2.321,2.321,0,0,0,34,180.994h0a2.321,2.321,0,0,0,2.321,2.321h1.805"
-            fill="none"
-            stroke="#114898"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="1.2"
-          />
-        </g>
-      </g>
-    </SvgIcon>
-  );
-};
+
 export const RecoverIcon = (props: any) => {
   return (
     <SvgIcon
