@@ -34,7 +34,6 @@ const Identity = () => {
     for (let i = 0; i < allUserClaimEncode.length; i++) {
       const element = allUserClaimEncode[i];
       const claimData = JSON.parse(libsodium.crypto_box_seal_open(libsodium.from_hex(element), libsodium.from_hex(keys.publicKey), libsodium.from_hex(keys.privateKey), "text"));
-      console.log("🚀 ~ file: index.tsx:39 ~ allUserClaimEncode.array.forEach ~ claimData:", claimData)
       allUserClaimData.push(claimData);
     }
 

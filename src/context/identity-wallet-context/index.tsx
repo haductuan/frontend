@@ -151,7 +151,6 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
   const syncClaim = React.useCallback(async () => {
     //@ts-ignore
     const userId = await getZidenUserID();
-    console.log("🚀 ~ file: index.tsx:27 ~ handleSync ~ userId:", userId)
     
     const libsodium = keyContainer.getCryptoUtil();
     const keys = keyContainer.generateKeyForBackup();
