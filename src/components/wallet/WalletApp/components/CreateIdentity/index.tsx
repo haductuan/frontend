@@ -1,4 +1,4 @@
-import { Button, StepButton, StepLabel } from "@mui/material";
+import { Button, CircularProgress, StepButton, StepLabel } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect } from "react";
 
@@ -13,6 +13,7 @@ import CreatePasswordForm from "../CreatePasswordForm";
 import Mnemonics from "../Mnemonics";
 import MnemonicsConfirm from "../MnemonicsConfirm";
 import Congrat from "../Congrat";
+import { LoadingButton } from "@mui/lab";
 
 interface createIdentityProps {
   goBack: any;
@@ -20,6 +21,7 @@ interface createIdentityProps {
 
 const CreateIdentity = ({ goBack }: createIdentityProps) => {
   const { keyContainer, updateUserData, setOpen } = useIdWalletContext();
+  const [loading, setLoading] = useState<boolean>(false);
   const [activeStep, setActiveStep] = useState(0);
   //passwordform state
   const [passwordFormData, setPasswordFormData] = useState({
@@ -118,7 +120,9 @@ const CreateIdentity = ({ goBack }: createIdentityProps) => {
     const isValid = checkFinalConfirm();
     if (isValid) {
       keyContainer.setMasterSeed(mnemonics);
+      setLoading(true);
       await keyContainer.generateZidenKeyFromMasterSeed(mnemonics);
+      setLoading(false);
       setActiveStep((prev: number) => prev + 1);
       // updateUserData();
     }
@@ -280,7 +284,21 @@ const CreateIdentity = ({ goBack }: createIdentityProps) => {
               },
             }}
           >
-            Confirm
+            {loading ? (
+              <Box
+                sx={{
+                  transform: "scale(0.5)",
+                }}
+              >
+                <CircularProgress
+                  sx={{
+                    color: "white",
+                  }}
+                />
+              </Box>
+            ) : (
+              "Confirm"
+            )}
           </Button>
         )}
         {activeStep === 3 && (

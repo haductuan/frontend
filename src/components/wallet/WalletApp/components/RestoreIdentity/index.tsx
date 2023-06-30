@@ -6,6 +6,7 @@ import RestoreAccountForm from "src/components/wallet/WalletApp/components/Resto
 import zidenLogo from "src/assets/image/logo/ziden_logo_desktop_2x.png";
 import CloseIcon from "@mui/icons-material/Close";
 import Congrat from "src/components/wallet/WalletApp/components/Congrat";
+import { LoadingButton } from "@mui/lab";
 
 interface restoreDataType {
   mnemonics: string;
@@ -16,7 +17,7 @@ interface restoreDataType {
 const RestoreIdentity = () => {
   const { keyContainer, updateUserData, goBack, setOpen } =
     useIdWalletContext();
-
+  const [loading, setLoading] = useState<boolean>(false);
   const [restoreData, setRestoreData] = useState<restoreDataType>({
     mnemonics: "",
     newPassword: "",
@@ -66,11 +67,13 @@ const RestoreIdentity = () => {
   const handleConfirm = async () => {
     if (checkRestoreData()) {
       try {
+        setLoading(true);
         keyContainer.unlock(restoreData.newPassword.trim());
         keyContainer.setMasterSeed(restoreData.mnemonics.trim());
         await keyContainer.generateZidenKeyFromMasterSeed(
           restoreData.mnemonics
         );
+        setLoading(false);
         // updateUserData();
         setIsDone(true);
       } catch (err: any) {
@@ -155,7 +158,8 @@ const RestoreIdentity = () => {
         }}
       >
         {!isDone && (
-          <Button
+          <LoadingButton
+            loading={loading}
             fullWidth
             variant="contained"
             sx={{
@@ -164,7 +168,7 @@ const RestoreIdentity = () => {
             onClick={handleConfirm}
           >
             Confirm
-          </Button>
+          </LoadingButton>
         )}
         {isDone && (
           <Button
