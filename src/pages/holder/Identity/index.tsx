@@ -24,73 +24,90 @@ const Identity = () => {
   const handleSync = React.useCallback(async () => {
     //@ts-ignore
     const userId = await getZidenUserID();
+    console.log("🚀 ~ file: index.tsx:27 ~ handleSync ~ userId:", userId)
+    
     const libsodium = keyContainer.getCryptoUtil();
     const keys = keyContainer.generateKeyForBackup();
 
-    // const allUserClaimEncode = (await zidenIssuer.get(`/claims/${userId}/retrieve-data`)).data;
-    
-    // let allUserClaimData: Array<any> = [];
-    // allUserClaimEncode.array.forEach((element: string) => {
-    // });
+    const allUserClaimEncode = (await zidenIssuer.get(`/claims/${userId}/retrieve-data`)).data;
 
-    // //check for backup
-    // if (allUserClaimData.length > 0) {
-    //   const localClaimId = getAllUserClaim().map((item) => item.id);
-    //   let allDataEncoded: any;
-    //   const resultData = allUserClaimData.data?.data
-    //     ?.filter((item: any) => {
-    //       //remove existed data
-    //       return !localClaimId.includes(item.claimId);
-    //     })
-    //     .map((claim: any) => {
-    //       return axios.get(claim.accessUri);
-    //     });
-    //   Promise.allSettled(resultData).then((res) => {
-    //     allDataEncoded = res
-    //       .map((data) => {
-    //         if (data.status === "fulfilled") {
-    //           try {
-    //             const nonce = data.value?.data?.nonce;
-    //             const dataDecrypted = libsodium.crypto_secretbox_open_easy(
-    //               libsodium.from_hex(data.value?.data?.data),
-    //               libsodium.from_hex(nonce),
-    //               libsodium.from_hex(dek),
-    //               "text"
-    //             );
-    //             return { id: data.value?.data?.claimId, data: dataDecrypted };
-    //           } catch (err) {
-    //             return false;
-    //           }
-    //         } else {
-    //           return false;
-    //         }
-    //       })
-    //       .filter((item) => item);
-    //     for (let i = 0; i < allDataEncoded.length; i++) {
-    //       const dataEncrypted = keyContainer.encryptWithDataKey(
-    //         allDataEncoded[i].data
-    //       );
-    //       const localDB = keyContainer.db;
-    //       if (localStorage.getItem("mobile-private-key")) {
-    //         //@ts-ignore
-    //         if (window.ReactNativeWebView) {
-    //           //@ts-ignore
-    //           window.ReactNativeWebView.postMessage(
-    //             JSON.stringify({
-    //               type: "claim",
-    //               data: allDataEncoded[i].data,
-    //             })
-    //           );
-    //         }
-    //       }
-    //       localDB.insert(
-    //         `ziden-user-claims/${allDataEncoded[i].id}`,
-    //         dataEncrypted
-    //       );
-    //     }
-    //     setRefresh((prev) => prev + 1);
-    //   });
-    // }
+    console.log("🚀 ~ file: index.tsx:32 ~ handleSync ~ allUserClaimEncode:", allUserClaimEncode)
+
+    console.log(keys);
+
+    let allUserClaimData: Array<any> = [];
+    for (let i = 0; i < allUserClaimEncode.length; i++) {
+      const element = allUserClaimEncode[i];
+      const claimData = JSON.parse(libsodium.crypto_box_seal_open(libsodium.from_hex(element), libsodium.from_hex(keys.publicKey), libsodium.from_hex(keys.privateKey), "text"));
+      console.log("🚀 ~ file: index.tsx:39 ~ allUserClaimEncode.array.forEach ~ claimData:", claimData)
+      allUserClaimData.push(claimData);
+    }
+
+    // all user claim data
+    // [ {claimId: id, claim: [entry], issuerId: id, rawData: stringJson, schemaHash: string} ]
+
+    console.log("🚀 ~ file: index.tsx:37 ~ allUserClaimEncode.array.forEach ~ allUserClaimData:", allUserClaimData)
+
+    //check for backup
+    if (allUserClaimData.length > 0) {
+      const localClaimId = getAllUserClaim().map((item) => item.id);
+      let allDataEncoded: any;
+      const resultData = allUserClaimData
+        ?.filter((item: any) => {
+          //remove existed data
+          return !localClaimId.includes(item.claimId);
+        })
+        .map((claim: any) => {
+          return claim
+        });
+      Promise.allSettled(resultData).then((res) => {
+        allDataEncoded = res
+          .map((data) => {
+            if (data.status === "fulfilled") {
+              try {
+                const dataDecrypted = JSON.stringify({
+                  claimId: data.value.claimId,
+                  claim: JSON.stringify({
+                    rawData: JSON.parse(data.value?.rawData),
+                    claim: data.value?.claim
+                  }),
+                  schemaHash: data.value?.schemaHash,
+                  issuerID: data.value?.issuerId,
+                });
+                return { id: data.value?.claimId, data: dataDecrypted };
+              } catch (err) {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          })
+          .filter((item) => item);
+        for (let i = 0; i < allDataEncoded.length; i++) {
+          const dataEncrypted = keyContainer.encryptWithDataKey(
+            allDataEncoded[i].data
+          );
+          const localDB = keyContainer.db;
+          if (localStorage.getItem("mobile-private-key")) {
+            //@ts-ignore
+            if (window.ReactNativeWebView) {
+              //@ts-ignore
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: "claim",
+                  data: allDataEncoded[i].data,
+                })
+              );
+            }
+          }
+          localDB.insert(
+            `ziden-user-claims/${allDataEncoded[i].id}`,
+            dataEncrypted
+          );
+        }
+        setRefresh((prev) => prev + 1);
+      });
+    }
     
   }, [keyContainer, getZidenUserID]);
 
