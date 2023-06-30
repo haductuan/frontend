@@ -8,6 +8,7 @@ import axios from "axios";
 import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import Await from "./components/Await";
+import { zidenIssuer } from "src/client/api";
 
 const Identity = () => {
   const [tab, setTab] = useState<number>(0);
@@ -26,9 +27,14 @@ const Identity = () => {
     const libsodium = keyContainer.getCryptoUtil();
     const keys = keyContainer.generateKeyForBackup();
 
+    // const allUserClaimEncode = (await zidenIssuer.get(`/claims/${userId}/retrieve-data`)).data;
     
+    // let allUserClaimData: Array<any> = [];
+    // allUserClaimEncode.array.forEach((element: string) => {
+    // });
+
     // //check for backup
-    // if (allUserClaimData.data?.data?.length > 0) {
+    // if (allUserClaimData.length > 0) {
     //   const localClaimId = getAllUserClaim().map((item) => item.id);
     //   let allDataEncoded: any;
     //   const resultData = allUserClaimData.data?.data
