@@ -24,16 +24,11 @@ const Identity = () => {
   const handleSync = React.useCallback(async () => {
     //@ts-ignore
     const userId = await getZidenUserID();
-    console.log("🚀 ~ file: index.tsx:27 ~ handleSync ~ userId:", userId)
     
     const libsodium = keyContainer.getCryptoUtil();
     const keys = keyContainer.generateKeyForBackup();
 
     const allUserClaimEncode = (await zidenIssuer.get(`/claims/${userId}/retrieve-data`)).data;
-
-    console.log("🚀 ~ file: index.tsx:32 ~ handleSync ~ allUserClaimEncode:", allUserClaimEncode)
-
-    console.log(keys);
 
     let allUserClaimData: Array<any> = [];
     for (let i = 0; i < allUserClaimEncode.length; i++) {
@@ -44,10 +39,7 @@ const Identity = () => {
     }
 
     // all user claim data
-    // [ {claimId: id, claim: [entry], issuerId: id, rawData: stringJson, schemaHash: string} ]
-
-    console.log("🚀 ~ file: index.tsx:37 ~ allUserClaimEncode.array.forEach ~ allUserClaimData:", allUserClaimData)
-
+    // [ {claimId: id, claim: [entry], issuerId: id, rawData: object, schemaHash: string} ]
     //check for backup
     if (allUserClaimData.length > 0) {
       const localClaimId = getAllUserClaim().map((item) => item.id);
@@ -68,7 +60,7 @@ const Identity = () => {
                 const dataDecrypted = JSON.stringify({
                   claimId: data.value.claimId,
                   claim: JSON.stringify({
-                    rawData: JSON.parse(data.value?.rawData),
+                    rawData: (data.value?.rawData),
                     claim: data.value?.claim
                   }),
                   schemaHash: data.value?.schemaHash,

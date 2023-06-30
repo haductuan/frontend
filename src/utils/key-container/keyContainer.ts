@@ -284,6 +284,7 @@ export default class KeyContainer {
           pubkeyY: pubkeyY,
           publicKey: backupKey.publicKey
         });
+        
       }
     } catch (err) {
     }

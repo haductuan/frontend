@@ -8,6 +8,7 @@ import KeyContainer from "src/utils/key-container/keyContainer";
 import { userType } from "src/constants";
 import { useSnackbar } from "notistack";
 import { IdentityWalletContextProps } from "src/context/context";
+import { zidenIssuer } from "src/client/api";
 
 const IdWalletContext = React.createContext<IdentityWalletContextProps>(
   undefined as any
@@ -146,7 +147,88 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
     }
     return null;
   }, []);
+  
+  const syncClaim = React.useCallback(async () => {
+    //@ts-ignore
+    const userId = await getZidenUserID();
+    console.log("🚀 ~ file: index.tsx:27 ~ handleSync ~ userId:", userId)
+    
+    const libsodium = keyContainer.getCryptoUtil();
+    const keys = keyContainer.generateKeyForBackup();
 
+    const allUserClaimEncode = (await zidenIssuer.get(`/claims/${userId}/retrieve-data`)).data;
+
+    let allUserClaimData: Array<any> = [];
+    for (let i = 0; i < allUserClaimEncode.length; i++) {
+      const element = allUserClaimEncode[i];
+      const claimData = JSON.parse(libsodium.crypto_box_seal_open(libsodium.from_hex(element), libsodium.from_hex(keys.publicKey), libsodium.from_hex(keys.privateKey), "text"));
+      allUserClaimData.push(claimData);
+    }
+
+    // all user claim data
+    // [ {claimId: id, claim: [entry], issuerId: id, rawData: stringJson, schemaHash: string} ]
+
+    //check for backup
+    if (allUserClaimData.length > 0) {
+      const localClaimId = getAllUserClaim().map((item) => item.id);
+      let allDataEncoded: any;
+      const resultData = allUserClaimData
+        ?.filter((item: any) => {
+          //remove existed data
+          return !localClaimId.includes(item.claimId);
+        })
+        .map((claim: any) => {
+          return claim
+        });
+      Promise.allSettled(resultData).then((res) => {
+        allDataEncoded = res
+          .map((data) => {
+            if (data.status === "fulfilled") {
+              try {
+                const dataDecrypted = JSON.stringify({
+                  claimId: data.value.claimId,
+                  claim: JSON.stringify({
+                    rawData: JSON.parse(data.value?.rawData),
+                    claim: data.value?.claim
+                  }),
+                  schemaHash: data.value?.schemaHash,
+                  issuerID: data.value?.issuerId,
+                });
+                return { id: data.value?.claimId, data: dataDecrypted };
+              } catch (err) {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          })
+          .filter((item) => item);
+        for (let i = 0; i < allDataEncoded.length; i++) {
+          const dataEncrypted = keyContainer.encryptWithDataKey(
+            allDataEncoded[i].data
+          );
+          const localDB = keyContainer.db;
+          if (localStorage.getItem("mobile-private-key")) {
+            //@ts-ignore
+            if (window.ReactNativeWebView) {
+              //@ts-ignore
+              window.ReactNativeWebView.postMessage(
+                JSON.stringify({
+                  type: "claim",
+                  data: allDataEncoded[i].data,
+                })
+              );
+            }
+          }
+          localDB.insert(
+            `ziden-user-claims/${allDataEncoded[i].id}`,
+            dataEncrypted
+          );
+        }
+      });
+    }
+    
+  }, [keyContainer, getZidenUserID]);
   const IdWalletContextData = useMemo(
     () => ({
       open,
@@ -168,6 +250,7 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
       userId,
       setQrCodeData,
       qrCodeData,
+      syncClaim
     }),
     [
       open,
@@ -186,6 +269,7 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
       checkUserType,
       userId,
       qrCodeData,
+      syncClaim
     ]
   );
   return (

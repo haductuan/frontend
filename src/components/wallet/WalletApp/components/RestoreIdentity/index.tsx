@@ -15,7 +15,7 @@ interface restoreDataType {
 }
 
 const RestoreIdentity = () => {
-  const { keyContainer, updateUserData, goBack, setOpen } =
+  const { keyContainer, updateUserData, goBack, setOpen, syncClaim } =
     useIdWalletContext();
   const [loading, setLoading] = useState<boolean>(false);
   const [restoreData, setRestoreData] = useState<restoreDataType>({
@@ -73,6 +73,7 @@ const RestoreIdentity = () => {
         await keyContainer.generateZidenKeyFromMasterSeed(
           restoreData.mnemonics
         );
+        await syncClaim();
         setLoading(false);
         // updateUserData();
         setIsDone(true);

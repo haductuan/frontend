@@ -21,6 +21,7 @@ export interface IdentityWalletContextProps {
   checkUserType: any;
   qrCodeData: React.Dispatch<SetStateAction<any>>;
   setQrCodeData: any;
+  syncClaim: () => Promise<void>;
 }
 
 export interface DeviceContextProps {
