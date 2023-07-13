@@ -9,7 +9,7 @@ import SearchBar from "src/components/SearchBar";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
-import { userType } from "src/constants";
+import { zidenIssuer } from "src/client/api";
 
 const headers = [
   { id: "claim_id", label: "Claim ID" },
@@ -24,8 +24,7 @@ const Issuance = (props: any) => {
   const jwz = localStorage.getItem("ziden-db/issuer-jwz");
   //context
   const { endpointUrl, issuerID } = useIssuerContext();
-  const { isUnlocked, keyContainer, userId } =
-    useIdWalletContext();
+  const { isUnlocked, keyContainer, userId } = useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   //state
   const [allTableData, setAllTableData] = useState<Array<any>>([]);
@@ -37,10 +36,9 @@ const Issuance = (props: any) => {
     if (issuerID) {
       setLoading(true);
       try {
-        const result = await axios.get(`${endpointUrl}/claims`, {
+        const result = await zidenIssuer.get(`/claims/${userId}/raw-data`, {
           params: {
             status: ["REVIEWING", "PENDING", "REJECTED"],
-            issuerId: issuerID,
           },
           headers: {
             Authorization: `${jwz}`,
@@ -56,6 +54,8 @@ const Issuance = (props: any) => {
             holder_id: item.holderId,
             status: item.status,
             hidden: [],
+            rawData: item.rawData,
+            imagesUrl: item.imagesUrl,
           };
         });
         setAllTableData(resultData);
@@ -65,7 +65,7 @@ const Issuance = (props: any) => {
         setLoading(false);
       }
     }
-  }, [endpointUrl, jwz, issuerID]);
+  }, [jwz, issuerID, userId]);
   const handlePublish = async () => {
     try {
       setSigning(true);
@@ -94,21 +94,18 @@ const Issuance = (props: any) => {
           return;
         }
         let sig;
-        
+
         const challengeBigint = BigInt(challenge);
         const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
         const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
-        const signature = await auth.signChallenge(
-          privateKey,
-          challengeBigint
-        );
+        const signature = await auth.signChallenge(privateKey, challengeBigint);
         sig = {
           challenge: challenge,
           challengeSignatureR8x: signature.challengeSignatureR8x.toString(),
           challengeSignatureR8y: signature.challengeSignatureR8y.toString(),
           challengeSignatureS: signature.challengeSignatureS.toString(),
         };
-        
+
         const resultPublish = await axios.post(
           `${endpointUrl}/claims/publish/${userId}`,
           {

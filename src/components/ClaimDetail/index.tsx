@@ -1,5 +1,6 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { LoadingButton } from "@mui/lab";
-import { Typography, SxProps, Theme, Box, CardMedia } from "@mui/material";
+import { Typography, SxProps, Theme, Box } from "@mui/material";
 import { useState } from "react";
 
 import { getStatusColor } from "src/pages/holder/Identity/components/OnDevice";
@@ -11,10 +12,12 @@ export interface detailDataType {
   create_date: number;
   holder_id: string;
   status: string;
-  kycData: {
+  id: string;
+  rawData?: {
     [otherProps: string]: string;
   };
-  userImage?: string;
+  imagesUrl?: string[];
+  hidden?: string[];
 }
 //style
 const row: SxProps<Theme> | undefined = (theme: Theme) => {
@@ -46,6 +49,7 @@ export default function ClaimDetail({
   accept: (claimId: string) => Promise<void>;
   reject: (claimId: string) => Promise<void>;
 }) {
+  console.log("🚀 ~ file: index.tsx:51 ~ displayData:", displayData.imagesUrl);
   const [loading, setLoading] = useState<boolean>(false);
   return (
     <Box>
@@ -166,9 +170,9 @@ export default function ClaimDetail({
         </Typography>
       </Box>
       {/* Kyc data */}
-      {displayData?.status?.toLowerCase() === "reviewing" && (
+      {displayData.rawData && (
         <>
-          {Object.entries(displayData.kycData).map(([key, value], index) => {
+          {Object.entries(displayData.rawData).map(([key, value], index) => {
             return (
               <Box sx={row} key={index}>
                 <Typography
@@ -195,16 +199,29 @@ export default function ClaimDetail({
               </Box>
             );
           })}
-          <Box sx={kycImage}>
-            <CardMedia
-              sx={{
-                width: "100%",
-                borderRadius: 2,
-              }}
-              component="img"
-              src={displayData?.userImage}
-            />
-          </Box>
+          {displayData?.imagesUrl && (
+            <Box sx={kycImage}>
+              {displayData?.imagesUrl?.map((item: string, index: number) => {
+                return (
+                  <Box
+                    sx={{
+                      width: "100%",
+                      maxWidth: "300px",
+                      overflow: "hidden",
+                    }}
+                  >
+                    <img
+                      src={item?.toString()}
+                      style={{
+                        width: "100%",
+                        // aspectRatio: 1.5,
+                      }}
+                    />
+                  </Box>
+                );
+              })}
+            </Box>
+          )}
           <Box
             sx={{
               display: "flex",

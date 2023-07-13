@@ -3,7 +3,6 @@ import { Box } from "@mui/material";
 import {
   TextField,
   Grid,
-  MenuItem,
   RadioGroup,
   Radio,
   FormControlLabel,
@@ -31,7 +30,7 @@ const GeneralInformation = ({
   setActiveStep: any;
   setNewSchemaData: any;
 }) => {
-  const { networks, endpointUrl, issuerID } = useIssuerContext();
+  const { endpointUrl, issuerID } = useIssuerContext();
   const { isUnlocked } = useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   const [expirationTime, setExpirationTime] = useState<number>();
@@ -39,15 +38,9 @@ const GeneralInformation = ({
     updatable: true,
     endpointUrl: endpointUrl,
     description: "",
+    network: "97",
   });
   const verifyData = () => {
-    if (!registryData["network"]) {
-      enqueueSnackbar("Network is empty!", {
-        autoHideDuration: 2000,
-        variant: "warning",
-      });
-      return false;
-    }
     if (!registryData["endpointUrl"]) {
       enqueueSnackbar("Endpoint URL is empty!", {
         autoHideDuration: 2000,
@@ -92,32 +85,6 @@ const GeneralInformation = ({
       }}
     >
       <Grid container spacing={2}>
-        <Grid item xs={12} xsm={12} md={12} lg={6}>
-          <TextField
-            label="Network"
-            fullWidth
-            select
-            value={registryData["network"] || ""}
-            onChange={(e) => {
-              setRegistryData((prev: registryType) => {
-                return {
-                  ...prev,
-                  network: e.target.value,
-                };
-              });
-            }}
-          >
-            {networks &&
-              networks.map((network: any, index: number) => {
-                return (
-                  <MenuItem key={index} value={network.networkId}>
-                    {" "}
-                    {network.name}
-                  </MenuItem>
-                );
-              })}
-          </TextField>
-        </Grid>
         <Grid item xs={12} xsm={12} md={12} lg={6}>
           <TextField
             label="Endpoint URL"
