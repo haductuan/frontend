@@ -29,10 +29,10 @@ const baseTypes = [
     label: "std:double",
     value: "std:double",
   },
-  {
-    label: "std:obj",
-    value: "std:obj",
-  },
+  //   {
+  //     label: "std:obj",
+  //     value: "std:obj",
+  //   },
   {
     label: "std:bool",
     value: "std:bool",
@@ -84,36 +84,47 @@ const allContext = [
   },
 ];
 
+const getIdValue = (number: number) => {
+  if (number > 8) {
+    return;
+  }
+  const prefix = ["idx-", "val-"];
+  return (
+    prefix[Math.floor(number / 4)] +
+    (2 - ((Math.floor(number / 2) + 1) % 2)).toString()
+  );
+};
+
 const NewSchema = () => {
-  const [schemaOptions, setSchemaOptions] = React.useState([
-    {
-      label: "KYC registration",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/kyc-registry.json",
-    },
-    {
-      label: "Basic course certificate",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/basic-course-certificate.json",
-    },
-    {
-      label: "Basic membership",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/basic-membership.json",
-    },
-    {
-      label: "KYC Form",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/kyc-registry.json",
-    },
-    {
-      label: "US Identity Docment",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/us-identity-document.json",
-    },
-  ]);
-  const [selectedSchema, setSelectedSchema] = useState<string>();
-  const [schema, setSchema] = useState<any>();
+  //   const [schemaOptions, setSchemaOptions] = React.useState([
+  //     {
+  //       label: "KYC registration",
+  //       value:
+  //         "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/kyc-registry.json",
+  //     },
+  //     {
+  //       label: "Basic course certificate",
+  //       value:
+  //         "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/basic-course-certificate.json",
+  //     },
+  //     {
+  //       label: "Basic membership",
+  //       value:
+  //         "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/basic-membership.json",
+  //     },
+  //     {
+  //       label: "KYC Form",
+  //       value:
+  //         "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/kyc-registry.json",
+  //     },
+  //     {
+  //       label: "US Identity Docment",
+  //       value:
+  //         "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/us-identity-document.json",
+  //     },
+  //   ]);
+  //   const [selectedSchema, setSelectedSchema] = useState<string>();
+  //   const [schema, setSchema] = useState<any>();
   const [schemaMetaData, setSchemaMetaData] = useState<any>();
   const [properties, setProperties] = useState<Array<any>>([]);
   const [contexts, setContexts] = React.useState<Array<any>>([]);
@@ -145,22 +156,22 @@ const NewSchema = () => {
     }
   };
   //get sub props of schema
-  const getSubPropertyData = (object: { [index: string]: any }) => {
-    if (object["@id"] !== undefined) {
-      const {
-        "@type": {},
-        "@id": {},
-        ...properties
-      } = object;
-      return properties;
-    } else {
-      const {
-        "@type": {},
-        ...properties
-      } = object;
-      return properties;
-    }
-  };
+  //   const getSubPropertyData = (object: { [index: string]: any }) => {
+  //     if (object["@id"] !== undefined) {
+  //       const {
+  //         "@type": {},
+  //         "@id": {},
+  //         ...properties
+  //       } = object;
+  //       return properties;
+  //     } else {
+  //       const {
+  //         "@type": {},
+  //         ...properties
+  //       } = object;
+  //       return properties;
+  //     }
+  //   };
   const fetchDataContent = React.useCallback(async (url: string) => {
     const res = await axios.get(url);
     return {
@@ -186,30 +197,30 @@ const NewSchema = () => {
     [fetchDataContent]
   );
 
-  const handleSelectedSchema = async (schemaUri: string) => {
-    const schemaData = await axios.get(schemaUri);
-    setProperties(
-      Object.keys(getPropertyData(schemaData.data)).map((item: any) => {
-        return {
-          name: item,
-          value: schemaData.data[item],
-          subProps: [], // need check
-        };
-      })
-    );
-    setContexts(
-      allContext.filter((context) => {
-        return schemaData.data["@context"].includes(context.value);
-      })
-    );
-    // setSchemaMetaData(schemaData.data);
-    setSchemaMetaData({
-      "@context": schemaData.data["@context"],
-      "@id": schemaData.data["@id"],
-      "@name": schemaData.data["@name"] + " copy",
-      "@type": schemaData.data["@type"],
-    });
-  };
+  //   const handleSelectedSchema = async (schemaUri: string) => {
+  //     const schemaData = await axios.get(schemaUri);
+  //     setProperties(
+  //       Object.keys(getPropertyData(schemaData.data)).map((item: any) => {
+  //         return {
+  //           name: item,
+  //           value: schemaData.data[item],
+  //           subProps: [], // need check
+  //         };
+  //       })
+  //     );
+  //     setContexts(
+  //       allContext.filter((context) => {
+  //         return schemaData.data["@context"].includes(context.value);
+  //       })
+  //     );
+  //     // setSchemaMetaData(schemaData.data);
+  //     setSchemaMetaData({
+  //       "@context": schemaData.data["@context"],
+  //       "@id": schemaData.data["@id"],
+  //       "@name": schemaData.data["@name"] + " copy",
+  //       "@type": schemaData.data["@type"],
+  //     });
+  //   };
   //update prop and type
   const handleAddProperty = () => {
     setProperties((prev: Array<any>) => {
@@ -255,20 +266,20 @@ const NewSchema = () => {
       return temp;
     });
   };
-  const handleChangeSlotIndex = (index: number, newSlotId: string) => {
-    setProperties((prev: Array<any>) => {
-      const name = prev[index].name;
-      let temp = prev.slice();
-      temp[index] = {
-        name: name,
-        value: {
-          ...temp[index].value,
-          "@id": newSlotId,
-        },
-      };
-      return temp;
-    });
-  };
+  //   const handleChangeSlotIndex = (index: number, newSlotId: string) => {
+  //     setProperties((prev: Array<any>) => {
+  //       const name = prev[index].name;
+  //       let temp = prev.slice();
+  //       temp[index] = {
+  //         name: name,
+  //         value: {
+  //           ...temp[index].value,
+  //           "@id": newSlotId,
+  //         },
+  //       };
+  //       return temp;
+  //     });
+  //   };
   //update subprop and type
   const handleAddSubProp = (index: number) => {
     setProperties((prev: Array<any>) => {
@@ -382,7 +393,7 @@ const NewSchema = () => {
             borderRadius: 3,
           }}
         >
-          <Grid
+          {/* <Grid
             container
             spacing={2}
             sx={{
@@ -410,7 +421,7 @@ const NewSchema = () => {
                   })}
               </TextField>
             </Grid>
-          </Grid>
+          </Grid> */}
           <Grid
             container
             spacing={2}
@@ -433,7 +444,7 @@ const NewSchema = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} xsm={12} md={12} lg={6}>
+            {/* <Grid item xs={12} xsm={12} md={12} lg={6}>
               <Autocomplete
                 key={selectedSchema}
                 multiple
@@ -451,7 +462,7 @@ const NewSchema = () => {
                   setContexts(newValue);
                 }}
               />
-            </Grid>
+            </Grid> */}
           </Grid>
           {properties &&
             properties.map((property: any, index: number) => {
@@ -465,7 +476,7 @@ const NewSchema = () => {
                   }}
                 >
                   <Grid container spacing={2}>
-                    <Grid item xs={2} xsm={2} md={1} lg={1}>
+                    {/* <Grid item xs={2} xsm={2} md={1} lg={1}>
                       <TextField
                         select
                         value={property?.value["@id"] || "none"}
@@ -487,8 +498,8 @@ const NewSchema = () => {
                           None
                         </MenuItem>
                       </TextField>
-                    </Grid>
-                    <Grid item xs={10} xsm={10} md={5} lg={5}>
+                    </Grid> */}
+                    <Grid item xs={12} xsm={12} md={6} lg={6}>
                       <TextField
                         value={property.name}
                         fullWidth
