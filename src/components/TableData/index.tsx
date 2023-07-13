@@ -17,7 +17,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { Box } from "@mui/system";
 import React, { useState, useEffect } from "react";
-import { zidenIssuerNew, zidenKYC } from "src/client/api";
+import { zidenIssuerNew } from "src/client/api";
 import { EmptyIcon } from "src/constants/icon";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import ClaimDetail, { detailDataType } from "../ClaimDetail";
@@ -105,38 +105,16 @@ const TableData = ({
     }
   };
   const handleShowDetail = async (item: any) => {
+    console.log("🚀 ~ file: index.tsx:108 ~ handleShowDetail ~ item:", item);
     setIsLoading(true);
     setOpen(true);
-    if (item["status"]?.toLowerCase() === "reviewing") {
-      const jwz = localStorage.getItem("ziden-db/issuer-jwz");
-      const res = (
-        await zidenKYC.get(`profile/${userId}?claimId=${item.id}`, {
-          headers: {
-            Authorization: `${jwz}`,
-          },
-        })
-      ).data?.claims[0];
-      if (res) {
-        const { image, claimId, id, issuerId, ...kycData } = res;
-        setDialogData({
-          ...item,
-          kycData: kycData,
-          userImage: res.image,
-        });
-      } else {
-        setDialogData({
-          ...item,
-          kycData: {} as detailDataType,
-          userImage: "",
-        });
-      }
-    } else {
-      setDialogData({
-        ...item,
-        kycData: {} as detailDataType,
-        userImage: "",
-      });
-    }
+    // if (item["status"]?.toLowerCase() === "reviewing") {
+    setDialogData(item);
+    // } else {
+    //   setDialogData({
+    //     ...item,
+    //   });
+    // }
     setIsLoading(false);
   };
   const accept = async (claimId: string) => {

@@ -1,105 +1,114 @@
-import { Button, Tab, Tabs } from "@mui/material";
+import { Button } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import Header from "src/components/Header";
 import OnDevice from "./components/OnDevice";
-import axios from "axios";
 import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import Await from "./components/Await";
 import { zidenIssuer } from "src/client/api";
+import RequireKYC from "./components/RequireKYC";
+import LoadingClaim from "./components/LoadingClaim";
 
 const Identity = () => {
   const [tab, setTab] = useState<number>(0);
   const [refresh, setRefresh] = useState<number>(0);
+  const [needKyc, setNeedKyc] = useState<boolean>(false);
+  const [kycRegistyId, setKycRegistyId] = useState<string>("");
+  const [fetching, setFetching] = useState<boolean>(false);
   //data
-  const {
-    keyContainer,
-    getZidenUserID,
-    isUnlocked,
-  } = useIdWalletContext();
+  const { keyContainer, getZidenUserID, isUnlocked } = useIdWalletContext();
 
   //push narrow victory wedding flower expand like object genuine wear away rocket
   const handleSync = React.useCallback(async () => {
-    //@ts-ignore
-    const userId = await getZidenUserID();
-    
-    const libsodium = keyContainer.getCryptoUtil();
-    const keys = keyContainer.generateKeyForBackup();
+    setFetching(true);
+    let isUserKyc = false;
+    try {
+      //@ts-ignore
+      const userId = await getZidenUserID();
+      const libsodium = keyContainer.getCryptoUtil();
+      const keys = keyContainer.generateKeyForBackup();
+      const kycSchema = (await zidenIssuer.get(`/did/kyc`)).data;
+      const kycSchemaHash = kycSchema.schemaHash;
+      setKycRegistyId(kycSchema.registryId);
+      const allUserClaimEncode = (
+        await zidenIssuer.get(`/claims/${userId}/retrieve-data`)
+      ).data;
 
-    const allUserClaimEncode = (await zidenIssuer.get(`/claims/${userId}/retrieve-data`)).data;
+      let allUserClaimData: Array<any> = [];
+      for (let i = 0; i < allUserClaimEncode.length; i++) {
+        const element = allUserClaimEncode[i];
+        const claimData = JSON.parse(
+          libsodium.crypto_box_seal_open(
+            libsodium.from_hex(element),
+            libsodium.from_hex(keys.publicKey),
+            libsodium.from_hex(keys.privateKey),
+            "text"
+          )
+        );
+        allUserClaimData.push(claimData);
+        if (claimData.schemaHash === kycSchemaHash) {
+          isUserKyc = true;
+        }
+      }
 
-    let allUserClaimData: Array<any> = [];
-    for (let i = 0; i < allUserClaimEncode.length; i++) {
-      const element = allUserClaimEncode[i];
-      const claimData = JSON.parse(libsodium.crypto_box_seal_open(libsodium.from_hex(element), libsodium.from_hex(keys.publicKey), libsodium.from_hex(keys.privateKey), "text"));
-      allUserClaimData.push(claimData);
-    }
-
-    // all user claim data
-    // [ {claimId: id, claim: [entry], issuerId: id, rawData: object, schemaHash: string} ]
-    //check for backup
-    if (allUserClaimData.length > 0) {
-      const localClaimId = getAllUserClaim().map((item) => item.id);
-      let allDataEncoded: any;
-      const resultData = allUserClaimData
-        ?.filter((item: any) => {
-          //remove existed data
-          return !localClaimId.includes(item.claimId);
-        })
-        .map((claim: any) => {
-          return claim
-        });
-      Promise.allSettled(resultData).then((res) => {
-        allDataEncoded = res
-          .map((data) => {
-            if (data.status === "fulfilled") {
-              try {
-                const dataDecrypted = JSON.stringify({
-                  claimId: data.value.claimId,
-                  claim: JSON.stringify({
-                    rawData: (data.value?.rawData),
-                    claim: data.value?.claim
-                  }),
-                  schemaHash: data.value?.schemaHash,
-                  issuerID: data.value?.issuerId,
-                });
-                return { id: data.value?.claimId, data: dataDecrypted };
-              } catch (err) {
+      // all user claim data
+      // [ {claimId: id, claim: [entry], issuerId: id, rawData: object, schemaHash: string} ]
+      //check for backup
+      if (allUserClaimData.length > 0) {
+        const localClaimId = getAllUserClaim().map((item) => item.id);
+        let allDataEncoded: any;
+        const resultData = allUserClaimData
+          ?.filter((item: any) => {
+            //remove existed data
+            return !localClaimId.includes(item.claimId);
+          })
+          .map((claim: any) => {
+            return claim;
+          });
+        Promise.allSettled(resultData).then((res) => {
+          allDataEncoded = res
+            .map((data) => {
+              if (data.status === "fulfilled") {
+                try {
+                  const dataDecrypted = JSON.stringify({
+                    claimId: data.value.claimId,
+                    claim: JSON.stringify({
+                      rawData: data.value?.rawData,
+                      claim: data.value?.claim,
+                    }),
+                    schemaHash: data.value?.schemaHash,
+                    issuerID: data.value?.issuerId,
+                  });
+                  return { id: data.value?.claimId, data: dataDecrypted };
+                } catch (err) {
+                  return false;
+                }
+              } else {
                 return false;
               }
-            } else {
-              return false;
-            }
-          })
-          .filter((item) => item);
-        for (let i = 0; i < allDataEncoded.length; i++) {
-          const dataEncrypted = keyContainer.encryptWithDataKey(
-            allDataEncoded[i].data
+            })
+            .filter((item) => item);
+          console.log(
+            "🚀 ~ file: index.tsx:81 ~ Promise.allSettled ~ allDataEncoded:",
+            allDataEncoded
           );
-          const localDB = keyContainer.db;
-          if (localStorage.getItem("mobile-private-key")) {
-            //@ts-ignore
-            if (window.ReactNativeWebView) {
-              //@ts-ignore
-              window.ReactNativeWebView.postMessage(
-                JSON.stringify({
-                  type: "claim",
-                  data: allDataEncoded[i].data,
-                })
-              );
-            }
+          for (let i = 0; i < allDataEncoded.length; i++) {
+            const dataEncrypted = keyContainer.encryptWithDataKey(
+              allDataEncoded[i].data
+            );
+            const localDB = keyContainer.db;
+            localDB.insert(
+              `ziden-user-claims/${allDataEncoded[i].id}`,
+              dataEncrypted
+            );
           }
-          localDB.insert(
-            `ziden-user-claims/${allDataEncoded[i].id}`,
-            dataEncrypted
-          );
-        }
-        setRefresh((prev) => prev + 1);
-      });
-    }
-    
+          setRefresh((prev) => prev + 1);
+        });
+      }
+      setNeedKyc(!isUserKyc);
+    } catch (error) {}
+    setFetching(false);
   }, [keyContainer, getZidenUserID]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -191,8 +200,9 @@ const Identity = () => {
           <Tab label="On Device" />
           <Tab label="Await" />
         </Tabs> */}
-        {tab === 0 && <OnDevice refresh={refresh} />}
-        {/* {tab === 1 && <Await />} */}
+        {!needKyc && !fetching && <OnDevice refresh={refresh} />}
+        {needKyc && !fetching && <RequireKYC registryId={kycRegistyId} />}
+        {fetching && <LoadingClaim />}
       </Box>
     </Box>
   );

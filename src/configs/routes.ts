@@ -144,21 +144,23 @@ export default [
     layout: LayoutOptions.MAIN,
   },
   {
+    path: "/issuer/registries",
+    exact: true,
+    component: React.lazy(() => import("src/pages/issuer/Registries")),
+    layout: LayoutOptions.MAIN,
+  },
+  {
+    path: "/issuer/registries/new-registry",
+    exact: true,
+    component: React.lazy(
+      () => import("src/pages/issuer/Registries/NewRegistries")
+    ),
+    layout: LayoutOptions.MAIN,
+  },
+  {
     path: "/issuer/schemas",
     exact: true,
     component: React.lazy(() => import("src/pages/issuer/Schemas")),
-    layout: LayoutOptions.MAIN,
-  },
-  {
-    path: "/issuer/schemas/new-schema",
-    exact: true,
-    component: React.lazy(() => import("src/pages/issuer/Schemas/NewSchema")),
-    layout: LayoutOptions.MAIN,
-  },
-  {
-    path: "/issuer/schemas/new-schemav2",
-    exact: true,
-    component: React.lazy(() => import("src/pages/issuer/Schemas/NewSchemaV2")),
     layout: LayoutOptions.MAIN,
   },
   {

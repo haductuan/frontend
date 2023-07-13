@@ -4,7 +4,6 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/system";
-import CircleIcon from "@mui/icons-material/Circle";
 import { schema as zidenSchema } from "@zidendev/zidenjs";
 import React, { useState } from "react";
 import { Button } from "@mui/material";

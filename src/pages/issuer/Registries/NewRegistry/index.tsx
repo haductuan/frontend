@@ -84,7 +84,7 @@ const allContext = [
   },
 ];
 
-const NewSchemaV2 = () => {
+const NewRegistry = () => {
   const [schemaOptions, setSchemaOptions] = React.useState([
     {
       label: "KYC registration",
@@ -764,4 +764,4 @@ const NewSchemaV2 = () => {
     </Box>
   );
 };
-export default NewSchemaV2;
+export default NewRegistry;

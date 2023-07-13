@@ -81,6 +81,15 @@ const SideBar = () => {
           disableMessage: "Please unlock your wallet and sign in",
         },
         {
+          to: "/issuer/registries",
+          name: "Registries",
+          disable:
+            isUnlocked && localStorage.getItem("ziden-db/issuer-jwz")
+              ? false
+              : true,
+          disableMessage: "Please unlock your wallet and sign in",
+        },
+        {
           to: "/issuer/schemas",
           name: "Schemas",
           disable:
