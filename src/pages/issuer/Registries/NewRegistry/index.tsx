@@ -22,8 +22,8 @@ const baseTypes = [
     value: "std:str",
   },
   {
-    label: "std:int64",
-    value: "std:int64",
+    label: "std:int",
+    value: "std:int",
   },
   {
     label: "std:double",

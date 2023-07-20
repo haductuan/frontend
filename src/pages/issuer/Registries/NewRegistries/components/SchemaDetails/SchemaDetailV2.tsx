@@ -16,10 +16,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
 import { parseLabel } from "src/utils/claim";
 import { useIssuerContext } from "src/context/issuerContext";
-import { LoadingButton } from "@mui/lab";
-import { useHistory } from "react-router-dom";
 import { useSnackbar } from "notistack";
-import { useIdWalletContext } from "src/context/identity-wallet-context";
 //const
 const baseTypes = [
   {
@@ -28,7 +25,7 @@ const baseTypes = [
   },
   {
     label: "standard:int64",
-    value: "std:int64",
+    value: "std:int",
   },
   {
     label: "standard:double",
