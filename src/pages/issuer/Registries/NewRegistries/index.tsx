@@ -9,6 +9,7 @@ import { useSnackbar } from "notistack";
 import { validateJWZ } from "src/utils/auth";
 import { useIssuerContext } from "src/context/issuerContext";
 import LoadingComponent from "src/components/LoadingComponent";
+import RegistryRequirements from "./components/RegistryRequirements";
 
 const NewRegistries = () => {
   const [activeStep, setActiveStep] = useState<number>(0);
@@ -123,6 +124,9 @@ const NewRegistries = () => {
               <Step key={1}>
                 <StepLabel>Schema details</StepLabel>
               </Step>
+              <Step key={2}>
+                <StepLabel>Schema requirements (optional)</StepLabel>
+              </Step>
             </Stepper>
 
             <Paper
@@ -151,6 +155,16 @@ const NewRegistries = () => {
               >
                 <SchemaDetailV2
                   setActiveStep={setActiveStep}
+                  setNewSchemaData={setNewSchemaData}
+                  newSchemaData={newSchemaData}
+                />
+              </Box>
+              <Box
+                sx={{
+                  display: activeStep === 2 ? "initial" : "none",
+                }}
+              >
+                <RegistryRequirements
                   setNewSchemaData={setNewSchemaData}
                   newSchemaData={newSchemaData}
                 />

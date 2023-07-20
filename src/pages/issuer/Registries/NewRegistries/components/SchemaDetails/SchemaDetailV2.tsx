@@ -116,43 +116,13 @@ const SchemaDetailV2 = ({
   setNewSchemaData?: any;
   newSchemaData?: any;
 }) => {
-  const [schemaOptions, setSchemaOptions] = React.useState([
-    {
-      label: "KYC registration",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/kyc-registry.json",
-    },
-    {
-      label: "Basic course certificate",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/basic-course-certificate.json",
-    },
-    {
-      label: "Basic membership",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/basic-membership.json",
-    },
-    {
-      label: "KYC Form",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/kyc-registry.json",
-    },
-    {
-      label: "US Identity Docment",
-      value:
-        "https://raw.githubusercontent.com/ziden-dev/schema-models/main/json/schemas/us-identity-document.json",
-    },
-  ]);
+  const [schemaOptions, setSchemaOptions] = React.useState([]);
   const [selectedSchema, setSelectedSchema] = useState<string>();
-  // const [schema, setSchema] = useState<any>();
-  const [loading, setLoading] = useState<boolean>(false);
   const [schemaMetaData, setSchemaMetaData] = useState<any>();
   const [properties, setProperties] = useState<Array<any>>([]);
   const [contexts, setContexts] = React.useState<Array<any>>([]);
   const [dataTypes, setDataTypes] = React.useState<Array<any>>(baseTypes);
   const { endpointUrl } = useIssuerContext();
-  const { keyContainer } = useIdWalletContext();
-  const history = useHistory();
   const { enqueueSnackbar } = useSnackbar();
   //get props of context/schema
   const getPropertyData = (object: { [index: string]: any }) => {
@@ -179,23 +149,7 @@ const SchemaDetailV2 = ({
       return properties;
     }
   };
-  //get sub props of schema
-  const getSubPropertyData = (object: { [index: string]: any }) => {
-    if (object["@id"] !== undefined) {
-      const {
-        "@type": {},
-        "@id": {},
-        ...properties
-      } = object;
-      return properties;
-    } else {
-      const {
-        "@type": {},
-        ...properties
-      } = object;
-      return properties;
-    }
-  };
+
   const fetchDataContent = React.useCallback(async (url: string) => {
     const res = await axios.get(url);
     return {
@@ -246,52 +200,7 @@ const SchemaDetailV2 = ({
       "@hash": schemaData["@hash"],
     });
   };
-  //update prop and type
-  const handleAddProperty = () => {
-    setProperties((prev: Array<any>) => {
-      return [
-        ...prev,
-        {
-          name: "",
-          value: {
-            "@id": "",
-            "@type": "std:str",
-          },
-          subProps: [],
-        },
-      ];
-    });
-  };
-  const handleAddIndexProperty = () => {
-    setProperties((prev: Array<any>) => {
-      return [
-        ...prev,
-        {
-          name: "",
-          value: {
-            "@id": "std-pos:idx-1",
-            "@type": "std:str",
-          },
-          subProps: [],
-        },
-      ];
-    });
-  };
-  const handleAddValueProperty = () => {
-    setProperties((prev: Array<any>) => {
-      return [
-        ...prev,
-        {
-          name: "",
-          value: {
-            "@id": "std-pos:val-1",
-            "@type": "std:str",
-          },
-          subProps: [],
-        },
-      ];
-    });
-  };
+
   const handleRemoveProperty = (removeIndex: number) => {
     setProperties((prev: Array<any>) => {
       return prev.filter((item: any, index: number) => {
@@ -299,21 +208,7 @@ const SchemaDetailV2 = ({
       });
     });
   };
-  const handleChangePropType = (index: number, newValue: string) => {
-    setProperties((prev: Array<any>) => {
-      // const name = prev[index].name;
-      const id = newValue === "std:obj" ? "none" : prev[index].value["@id"];
-      let temp = prev.slice();
-      temp[index].value = {
-        "@id": id,
-        "@type": newValue,
-      };
-      if (newValue !== "std:obj") {
-        temp[index].subProps = [];
-      }
-      return temp;
-    });
-  };
+
   const handleChangeIndexPropType = (index: number, newValue: string) => {
     setProperties((prev: Array<any>) => {
       // const name = prev[index].name;
@@ -353,20 +248,7 @@ const SchemaDetailV2 = ({
       return temp;
     });
   };
-  const handleChangeSlotIndex = (index: number, newSlotId: string) => {
-    setProperties((prev: Array<any>) => {
-      const name = prev[index].name;
-      let temp = prev.slice();
-      temp[index] = {
-        name: name,
-        value: {
-          ...temp[index].value,
-          "@id": newSlotId,
-        },
-      };
-      return temp;
-    });
-  };
+
   //update subprop and type
   const handleAddSubProp = (index: number) => {
     setProperties((prev: Array<any>) => {
@@ -427,56 +309,21 @@ const SchemaDetailV2 = ({
       return temp;
     });
   };
-  const handleConfirm = async () => {
-    let jsonData = {
-      ...schemaMetaData,
-      "@context": contexts,
-    };
-    for (const i of properties) {
-      if (i["subProps"]?.length === 0) {
-        jsonData[i["name"]] = i["value"];
-      } else {
-        jsonData[i["name"]] = i["value"];
-        for (const j of i["subProps"]) {
-          jsonData[i["name"]][j["name"]] = {
-            "@type": j["type"],
-            "@id": j["id"],
-          };
-        }
-      }
-    }
-    console.log("Generated json: ", jsonData);
-  };
+
   const handleSubmit = async () => {
-    const jwz = keyContainer.db.get("issuer-jwz");
-    setLoading(true);
-    try {
-      await axios.post(
-        `${endpointUrl}/registries`,
-        {
-          schemaHash: schemaMetaData["@hash"],
-          issuerId: newSchemaData?.registry?.issuerId,
-          description: newSchemaData?.registry?.description,
-          expiration: parseInt(newSchemaData?.registry?.expiration),
-          updatetable: newSchemaData?.registry?.updatable,
-          networkId: newSchemaData?.registry?.network,
-          endpointUrl: newSchemaData?.registry?.endpointUrl,
-        },
-        {
-          headers: {
-            Authorization: `${jwz}`,
-          },
-        }
-      );
-      enqueueSnackbar("Success!", {
-        autoHideDuration: 1500,
-        variant: "success",
+    if (!schemaMetaData) {
+      enqueueSnackbar("Please select an schema", {
+        variant: "info",
       });
-      history.push("/issuer/schemas");
-      setLoading(false);
-    } catch (err) {
-      setLoading(false);
+      return;
     }
+    setNewSchemaData((prev: any) => {
+      return {
+        ...prev,
+        schemaHash: schemaMetaData["@hash"],
+      };
+    });
+    setActiveStep((prev: any) => prev + 1);
   };
   React.useEffect(() => {
     const fetchAllTemplate = async () => {
@@ -594,321 +441,274 @@ const SchemaDetailV2 = ({
       // }}
       >
         {properties?.map((property: any, index: number) => {
-          if (property?.value["@id"].startsWith("std-pos:idx")) {
-            return (
-              <Grid
-                item
-                xs={12}
-                key={index}
-                sx={{
-                  mb: 2,
-                }}
-              >
-                <Grid container spacing={2}>
-                  {/* <Grid item xs={2} xsm={2} md={1} lg={1}>
+          // if (property?.value["@id"].startsWith("std-pos:idx")) {
+          return (
+            <Grid
+              item
+              xs={12}
+              key={index}
+              sx={{
+                mb: 2,
+              }}
+            >
+              <Grid container spacing={2}>
+                <Grid item xs={12} xsm={12} md={6} lg={6}>
+                  <TextField
+                    disabled
+                    value={parseLabel(property.name)}
+                    fullWidth
+                    label={`Property name`}
+                    onChange={(e) => {
+                      handleChangePropName(index, e.target.value);
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} xsm={12} md={6} lg={6}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: {
+                        xs: "column",
+                        md: "row",
+                      },
+                      alignItems: {
+                        xs: "flex-end",
+                        md: "center",
+                      },
+                    }}
+                  >
+                    {" "}
                     <TextField
-                      select
-                      value={property?.value["@id"] || "none"}
+                      disabled
                       fullWidth
-                      label={`ID`}
+                      select
+                      label={`Type`}
+                      value={property?.value["@type"] || ""}
                       onChange={(e) => {
-                        handleChangeSlotIndex(index, e.target.value);
+                        handleChangeIndexPropType(index, e.target.value);
                       }}
-                      disabled={property.value["@type"] === "std:obj"}
                     >
-                      {slotIndex.map((item: any, index: number) => {
+                      {dataTypes.map((type: any, index: number) => {
                         return (
-                          <MenuItem key={index} value={item.value}>
-                            {item.label}
+                          <MenuItem key={index} value={type.value}>
+                            {type.label}
                           </MenuItem>
                         );
                       })}
-                      <MenuItem value={"none"} sx={{ display: "none" }}>
-                        None
-                      </MenuItem>
                     </TextField>
-                  </Grid> */}
-                  <Grid item xs={12} xsm={12} md={6} lg={6}>
-                    <TextField
-                      disabled
-                      value={parseLabel(property.name)}
-                      fullWidth
-                      label={`Property name`}
-                      onChange={(e) => {
-                        handleChangePropName(index, e.target.value);
-                      }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} xsm={12} md={6} lg={6}>
                     <Box
                       sx={{
                         display: "flex",
-                        flexDirection: {
-                          xs: "column",
-                          md: "row",
-                        },
-                        alignItems: {
-                          xs: "flex-end",
-                          md: "center",
-                        },
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        ml: 1.5,
+                        py: 1,
+                        minWidth: "92px",
                       }}
                     >
-                      {" "}
-                      <TextField
-                        disabled
-                        fullWidth
-                        select
-                        label={`Type`}
-                        value={property?.value["@type"] || ""}
-                        onChange={(e) => {
-                          handleChangeIndexPropType(index, e.target.value);
-                        }}
-                      >
-                        {dataTypes.map((type: any, index: number) => {
-                          return (
-                            <MenuItem key={index} value={type.value}>
-                              {type.label}
-                            </MenuItem>
-                          );
-                        })}
-                      </TextField>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "flex-end",
-                          ml: 1.5,
-                          py: 1,
-                          minWidth: "92px",
-                        }}
-                      >
-                        <Tooltip title="Add sub property">
-                          <Button
-                            sx={{
-                              minWidth: "0px",
-                              width: "34px",
-                              minHeight: "0px",
-                              height: "34px",
-                              borderRadius: "50%",
-                              backgroundColor: "#FEF7F2",
-                              color: "#F7A088",
-                              ml: 1.5,
-                              display:
-                                property.value["@type"] === "std:obj"
-                                  ? "auto"
-                                  : "none",
-                            }}
-                            onClick={() => {
-                              handleAddSubProp(index);
-                            }}
-                          >
-                            <AddOutlinedIcon />
-                          </Button>
-                        </Tooltip>
-                        <Tooltip title="Remove current property">
-                          <Button
-                            sx={{
-                              minWidth: "0px",
-                              width: "34px",
-                              minHeight: "0px",
-                              height: "34px",
-                              borderRadius: "50%",
-                              backgroundColor: "#FEF7F2",
-                              color: "#F7A088",
-                              ml: 1.5,
-                            }}
-                            onClick={() => {
-                              handleRemoveProperty(index);
-                            }}
-                          >
-                            <RemoveOutlinedIcon />
-                          </Button>
-                        </Tooltip>
-                      </Box>
+                      <Tooltip title="Add sub property">
+                        <Button
+                          sx={{
+                            minWidth: "0px",
+                            width: "34px",
+                            minHeight: "0px",
+                            height: "34px",
+                            borderRadius: "50%",
+                            backgroundColor: "#FEF7F2",
+                            color: "#F7A088",
+                            ml: 1.5,
+                            display:
+                              property.value["@type"] === "std:obj"
+                                ? "auto"
+                                : "none",
+                          }}
+                          onClick={() => {
+                            handleAddSubProp(index);
+                          }}
+                        >
+                          <AddOutlinedIcon />
+                        </Button>
+                      </Tooltip>
+                      <Tooltip title="Remove current property">
+                        <Button
+                          sx={{
+                            minWidth: "0px",
+                            width: "34px",
+                            minHeight: "0px",
+                            height: "34px",
+                            borderRadius: "50%",
+                            backgroundColor: "#FEF7F2",
+                            color: "#F7A088",
+                            ml: 1.5,
+                          }}
+                          onClick={() => {
+                            handleRemoveProperty(index);
+                          }}
+                        >
+                          <RemoveOutlinedIcon />
+                        </Button>
+                      </Tooltip>
                     </Box>
-                  </Grid>
+                  </Box>
                 </Grid>
-                {property?.subProps?.length > 0 && (
-                  <Box
-                    sx={{
-                      backgroundColor: "#EFEFEF",
-                      boxShadow: "inset 0px -1px 6px #00000029",
-                      mt: 2,
-                      p: {
-                        xs: 2,
-                        xsm: 2,
-                        md: 3,
-                        lg: 5,
-                      },
-                      borderBottomLeftRadius: "16px",
-                      borderBottomRightRadius: "16px",
-                    }}
-                  >
-                    <Grid container spacing={2}>
-                      {property?.subProps?.map(
-                        (subProp: any, subIndex: number) => {
-                          return (
-                            <React.Fragment key={subIndex}>
-                              <Grid item xs={2} xsm={2} md={1} lg={1}>
+              </Grid>
+              {property?.subProps?.length > 0 && (
+                <Box
+                  sx={{
+                    backgroundColor: "#EFEFEF",
+                    boxShadow: "inset 0px -1px 6px #00000029",
+                    mt: 2,
+                    p: {
+                      xs: 2,
+                      xsm: 2,
+                      md: 3,
+                      lg: 5,
+                    },
+                    borderBottomLeftRadius: "16px",
+                    borderBottomRightRadius: "16px",
+                  }}
+                >
+                  <Grid container spacing={2}>
+                    {property?.subProps?.map(
+                      (subProp: any, subIndex: number) => {
+                        return (
+                          <React.Fragment key={subIndex}>
+                            <Grid item xs={2} xsm={2} md={1} lg={1}>
+                              <TextField
+                                disabled
+                                select
+                                fullWidth
+                                label={`Sub ID`}
+                                onChange={(e) => {
+                                  handleChangeSubPropsIndex(
+                                    index,
+                                    subIndex,
+                                    e.target.value
+                                  );
+                                }}
+                                value={subProp.id}
+                                // disabled={property.value["@type"] === "std:obj"}
+                              >
+                                {slotIndex.map((item: any, index: number) => {
+                                  return (
+                                    <MenuItem key={index} value={item.value}>
+                                      {item.label}
+                                    </MenuItem>
+                                  );
+                                })}
+                                <MenuItem
+                                  value={"none"}
+                                  sx={{ display: "none" }}
+                                >
+                                  None
+                                </MenuItem>
+                              </TextField>
+                            </Grid>
+                            <Grid item xs={10} xsm={10} md={5} lg={5}>
+                              <TextField
+                                disabled
+                                fullWidth
+                                label={`Property ${index + 1}.${subIndex + 1}`}
+                                onChange={(e) => {
+                                  handleChangeSubPropsName(
+                                    index,
+                                    subIndex,
+                                    e.target.value
+                                  );
+                                }}
+                                value={subProp.name || ""}
+                              />
+                            </Grid>
+                            <Grid item xs={12} xsm={12} md={6} lg={6}>
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: {
+                                    xs: "column",
+                                    md: "row",
+                                  },
+                                  alignItems: {
+                                    xs: "flex-end",
+                                    md: "center",
+                                  },
+                                }}
+                              >
                                 <TextField
                                   disabled
                                   select
                                   fullWidth
-                                  label={`Sub ID`}
+                                  label="Type"
                                   onChange={(e) => {
-                                    handleChangeSubPropsIndex(
+                                    handleUpdateSubPropsType(
                                       index,
                                       subIndex,
                                       e.target.value
                                     );
                                   }}
-                                  value={subProp.id}
-                                  // disabled={property.value["@type"] === "std:obj"}
+                                  value={subProp["type"] || ""}
                                 >
-                                  {slotIndex.map((item: any, index: number) => {
-                                    return (
-                                      <MenuItem key={index} value={item.value}>
-                                        {item.label}
-                                      </MenuItem>
-                                    );
-                                  })}
-                                  <MenuItem
-                                    value={"none"}
-                                    sx={{ display: "none" }}
-                                  >
-                                    None
-                                  </MenuItem>
-                                </TextField>
-                              </Grid>
-                              <Grid item xs={10} xsm={10} md={5} lg={5}>
-                                <TextField
-                                  disabled
-                                  fullWidth
-                                  label={`Property ${index + 1}.${
-                                    subIndex + 1
-                                  }`}
-                                  onChange={(e) => {
-                                    handleChangeSubPropsName(
-                                      index,
-                                      subIndex,
-                                      e.target.value
-                                    );
-                                  }}
-                                  value={subProp.name || ""}
-                                />
-                              </Grid>
-                              <Grid item xs={12} xsm={12} md={6} lg={6}>
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    flexDirection: {
-                                      xs: "column",
-                                      md: "row",
-                                    },
-                                    alignItems: {
-                                      xs: "flex-end",
-                                      md: "center",
-                                    },
-                                  }}
-                                >
-                                  <TextField
-                                    disabled
-                                    select
-                                    fullWidth
-                                    label="Type"
-                                    onChange={(e) => {
-                                      handleUpdateSubPropsType(
-                                        index,
-                                        subIndex,
-                                        e.target.value
+                                  {dataTypes
+                                    .filter((item) => {
+                                      // remove object type on sub properties
+                                      return item.value !== "std:obj";
+                                    })
+                                    .map((type: any, index: number) => {
+                                      return (
+                                        <MenuItem
+                                          key={index}
+                                          value={type.value}
+                                        >
+                                          {type.label}
+                                        </MenuItem>
                                       );
+                                    })}
+                                </TextField>
+                                <Tooltip title="Remove current sub property">
+                                  <Button
+                                    sx={{
+                                      minWidth: "0px",
+                                      width: "34px",
+                                      minHeight: "0px",
+                                      height: "34px",
+                                      borderRadius: "50%",
+                                      backgroundColor: "#FEF7F2",
+                                      color: "#F7A088",
+                                      mr: {
+                                        xs: 0,
+                                        xsm: 0,
+                                        md: 3,
+                                        lg: 1,
+                                      },
+                                      ml: 3,
+                                      mt: 1,
+                                      mb: {
+                                        xs: 0,
+                                        xsm: 1,
+                                      },
                                     }}
-                                    value={subProp["type"] || ""}
+                                    onClick={() => {
+                                      handleRemoveSubProp(index, subIndex);
+                                    }}
                                   >
-                                    {dataTypes
-                                      .filter((item) => {
-                                        // remove object type on sub properties
-                                        return item.value !== "std:obj";
-                                      })
-                                      .map((type: any, index: number) => {
-                                        return (
-                                          <MenuItem
-                                            key={index}
-                                            value={type.value}
-                                          >
-                                            {type.label}
-                                          </MenuItem>
-                                        );
-                                      })}
-                                  </TextField>
-                                  <Tooltip title="Remove current sub property">
-                                    <Button
-                                      sx={{
-                                        minWidth: "0px",
-                                        width: "34px",
-                                        minHeight: "0px",
-                                        height: "34px",
-                                        borderRadius: "50%",
-                                        backgroundColor: "#FEF7F2",
-                                        color: "#F7A088",
-                                        mr: {
-                                          xs: 0,
-                                          xsm: 0,
-                                          md: 3,
-                                          lg: 1,
-                                        },
-                                        ml: 3,
-                                        mt: 1,
-                                        mb: {
-                                          xs: 0,
-                                          xsm: 1,
-                                        },
-                                      }}
-                                      onClick={() => {
-                                        handleRemoveSubProp(index, subIndex);
-                                      }}
-                                    >
-                                      <RemoveOutlinedIcon />
-                                    </Button>
-                                  </Tooltip>
-                                </Box>
-                              </Grid>
-                            </React.Fragment>
-                          );
-                        }
-                      )}
-                    </Grid>
-                  </Box>
-                )}
-              </Grid>
-            );
-          }
+                                    <RemoveOutlinedIcon />
+                                  </Button>
+                                </Tooltip>
+                              </Box>
+                            </Grid>
+                          </React.Fragment>
+                        );
+                      }
+                    )}
+                  </Grid>
+                </Box>
+              )}
+            </Grid>
+          );
+          // }
         })}
-        {/* {properties?.length > 0 && (
-          <Box sx={{ py: 1 }}>
-            <Button
-               
-              variant="contained"
-              color="secondary"
-              onClick={handleAddIndexProperty}
-              sx={{
-                width: {
-                  xs: "100%",
-                  xsm: "auto",
-                },
-              }}
-            >
-              Add index property
-            </Button>
-          </Box>
-        )} */}
       </Box>
-      <Box
-      // sx={{
-      //   mt: 5,
-      // }}
-      >
-        {properties?.map((property: any, index: number) => {
+      <Box>
+        {/* {properties?.map((property: any, index: number) => {
           if (property?.value["@id"].startsWith("std-pos:val")) {
             return (
               <Grid
@@ -920,29 +720,6 @@ const SchemaDetailV2 = ({
                 }}
               >
                 <Grid container spacing={2}>
-                  {/* <Grid item xs={2} xsm={2} md={1} lg={1}>
-                    <TextField
-                      select
-                      value={property?.value["@id"] || "none"}
-                      fullWidth
-                      label={`ID`}
-                      onChange={(e) => {
-                        handleChangeSlotIndex(index, e.target.value);
-                      }}
-                      disabled={property.value["@type"] === "std:obj"}
-                    >
-                      {slotIndex.map((item: any, index: number) => {
-                        return (
-                          <MenuItem key={index} value={item.value}>
-                            {item.label}
-                          </MenuItem>
-                        );
-                      })}
-                      <MenuItem value={"none"} sx={{ display: "none" }}>
-                        None
-                      </MenuItem>
-                    </TextField>
-                  </Grid> */}
                   <Grid item xs={12} xsm={12} md={6} lg={6}>
                     <TextField
                       disabled
@@ -1198,7 +975,7 @@ const SchemaDetailV2 = ({
               </Grid>
             );
           }
-        })}
+        })} */}
         {/* {properties?.length > 0 && (
           <Box sx={{ py: 1 }}>
             <Button
@@ -1237,15 +1014,14 @@ const SchemaDetailV2 = ({
         >
           Cancel
         </Button>
-        <LoadingButton
-          loading={loading}
+        <Button
           // onClick={handleConfirm}
           onClick={handleSubmit}
           variant="contained"
           color="primary"
         >
           Next
-        </LoadingButton>
+        </Button>
       </Box>
     </Box>
   );
