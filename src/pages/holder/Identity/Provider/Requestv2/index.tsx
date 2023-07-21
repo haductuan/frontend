@@ -1042,7 +1042,7 @@ const Requestv2 = () => {
                           inputRef.current?.click();
                         }}
                       >
-                        Upload image
+                        {imageFile ? "Image uploaded" : "Upload image"}
                       </Button>
                     </>
                   )}
