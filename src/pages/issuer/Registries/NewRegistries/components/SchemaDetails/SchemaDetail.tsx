@@ -68,24 +68,6 @@ const SchemaDetail = ({
       });
     });
   };
-  const handleRemoveSubProperties = (id: number, subId: number) => {
-    setSchema((prev: Array<any>) => {
-      return prev.map((item: any, index: number) => {
-        if (id === index) {
-          return {
-            ...item,
-            subProperties: item.subProperties.filter(
-              (sunItem: any, subIndex: number) => {
-                return subIndex !== subId;
-              }
-            ),
-          };
-        } else {
-          return item;
-        }
-      });
-    });
-  };
   /**
    * input:
    *  - key of property (name / type),
@@ -155,11 +137,6 @@ const SchemaDetail = ({
   };
   const fetchAllSchemaTypes = async () => {
     const schemasResult = await zidenBackend.get(`/schemas`);
-    // console.log(
-    // console.log(
-    //   "🚀 ~ file: SchemaDetail.tsx:160 ~ fetchAllSchemaTypes ~ schemasResult",
-    //   schemasResult
-    // );
     setAllSchemaData(schemasResult.data?.schemas || []);
   };
   const handleTemplateChange = (e: any) => {
@@ -224,7 +201,7 @@ const SchemaDetail = ({
     });
 
     try {
-      const uploadResult = await zidenBackend.post("/registries/schemas", {
+      await zidenBackend.post("/registries/schemas", {
         ...newSchemaData,
         schema: dataToUpload,
       });

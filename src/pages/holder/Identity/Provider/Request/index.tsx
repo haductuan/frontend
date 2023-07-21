@@ -13,7 +13,6 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import Header from "src/components/Header";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { schema as zidenSchema } from "@zidendev/zidenjs";
 import { zidenPortal } from "src/client/api";
 import { useSnackbar } from "notistack";
 import LoadingComponent from "src/components/LoadingComponent";
@@ -60,8 +59,7 @@ const Request = () => {
   const [issuerID, setIssuerID] = useState<any>();
   const [endPointUrl, setEndpointUrl] = useState<string>("");
   const { enqueueSnackbar } = useSnackbar();
-  const { keyContainer, isUnlocked, getZidenUserID } =
-    useIdWalletContext();
+  const { keyContainer, isUnlocked, getZidenUserID } = useIdWalletContext();
   const history = useHistory();
   useEffect(() => {
     async function fetchSchema() {
@@ -174,7 +172,6 @@ const Request = () => {
           dataEncrypted
         );
         const backupKeys = keyContainer.generateKeyForBackup();
-        
       } catch (err) {
         console.log(err);
       }

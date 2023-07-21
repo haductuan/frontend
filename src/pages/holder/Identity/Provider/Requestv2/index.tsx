@@ -2,6 +2,7 @@
 import {
   Autocomplete,
   Avatar,
+  Button,
   Grid,
   MenuItem,
   NativeSelect,
@@ -10,18 +11,34 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import { zidenIssuerNew, zidenPortal } from "src/client/api";
 import Header from "src/components/Header";
-import { schema as zidenSchema } from "@zidendev/zidenjs";
+import {
+  Query,
+  SignedChallenge,
+  auth,
+  queryMTP,
+  schema,
+  schema as zidenSchema,
+} from "@zidendev/zidenjs";
 import { truncateString } from "src/utils/wallet/walletUtils";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { LoadingButton } from "@mui/lab";
 import { useSnackbar } from "notistack";
 import { PulseLoadingIcon } from "src/constants/icon";
-import { parseLabel } from "src/utils/claim";
-import { userType } from "src/constants";
+import {
+  flattenData,
+  generateProof,
+  parseIssuerClaimMtp,
+  parseLabel,
+  parseNonRevMtp,
+} from "src/utils/claim";
+
+import { getAllUserClaim } from "src/utils/db/localStorageDb";
+import { utils as zidenUtils } from "@zidendev/zidenjs";
+import { Entry } from "@zidendev/zidenjs/build/claim/entry";
 
 const dataTypeMaping = (type: string) => {
   switch (type) {
@@ -66,11 +83,9 @@ const infoStyle = (theme: any) => {
 
 const Requestv2 = () => {
   const { enqueueSnackbar } = useSnackbar();
-  const {
-    isUnlocked,
-    keyContainer,
-    getZidenUserID,
-  } = useIdWalletContext();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const { isUnlocked, keyContainer, updateUserData, userId } =
+    useIdWalletContext();
   const params: any = useParams();
   const history = useHistory();
   const [form, setForm] = useState<any>({});
@@ -80,6 +95,10 @@ const Requestv2 = () => {
   const [loading, setLoading] = useState<boolean>();
   const [fetching, setFetching] = useState<boolean>(false);
   const [helperText, setHelperText] = useState<any>({});
+  const [requirements, setRequirements] = useState<Array<any>>([]);
+  const [processedRequireData, setProcessedRequireData] = useState<any>();
+  const [allClaims, setAllclaims] = useState<any>();
+  const [imageFile, setImageFile] = useState<Blob>();
 
   useEffect(() => {
     async function fetchSchema() {
@@ -88,6 +107,7 @@ const Requestv2 = () => {
         const registryMetaData = await zidenPortal.get(
           `/registries/${params.requestID}`
         );
+        setRequirements(registryMetaData.data.registry.requirements);
         setMetaData(registryMetaData.data?.registry);
         const schemaHash = registryMetaData?.data?.registry?.schema?.schemaHash;
         const schemaDetail = await zidenPortal.get(`/schemas/${schemaHash}`);
@@ -107,6 +127,7 @@ const Requestv2 = () => {
     }
     fetchSchema();
   }, [params.requestID]);
+
   //input: datatype, context data, replace all none std type with context data , if type="std:obj" replace all sub props with contextData
   const handleChangeFormData = (field: string, value: any, type: string) => {
     let processedValue = value;
@@ -121,6 +142,7 @@ const Requestv2 = () => {
       };
     });
   };
+
   const handleChangeFormSubData = (
     field: string,
     subField: string,
@@ -148,7 +170,6 @@ const Requestv2 = () => {
   const handleConfirm = async () => {
     if (isUnlocked) {
       let isValid = true;
-      setHelperText({});
       for (const require of required) {
         if (formData[require] !== 0 && !formData[require]) {
           setHelperText((prev: any) => {
@@ -160,25 +181,50 @@ const Requestv2 = () => {
       if (!isValid) {
         return;
       }
-      try {
-        setLoading(true);
-        const libsodium = keyContainer.getCryptoUtil();
-        const userID = await getZidenUserID();
+      setLoading(true);
+      const witness = await Promise.all(
+        processedRequireData.map(async (item: any) => {
+          return checkClaimValidation(item.validClaim, item);
+        })
+      );
+      const proofs = await Promise.all(
+        witness.map(async (result) => {
+          if (result?.valid) {
+            try {
+              const resultProof = await generateProof(result.witness);
+              return {
+                proof: resultProof?.proof,
+                publicData: resultProof?.publicSignals,
+              };
+            } catch (err) {
+              throw err;
+            }
+          } else {
+            return 2;
+          }
+        })
+      );
+      setHelperText({});
 
+      try {
+        // const libsodium = keyContainer.getCryptoUtil();
+
+        const requestBody = new FormData();
+        requestBody.append("holderId", userId);
+        requestBody.append("registryId", params.requestID);
+        requestBody.append("data", JSON.stringify(formData));
+        requestBody.append("zkProofs", JSON.stringify(proofs));
+        imageFile && requestBody.append("fileUpload", imageFile);
         const result = await zidenIssuerNew.post(
           `/claims/request/${metaData?.issuer?.issuerId}`,
-          {
-            holderId: userID,
-            registryId: params.requestID,
-            data: formData,
-          }
+          requestBody
         );
 
         const data = JSON.stringify({
           claimId: result.data?.claimId,
           claim: JSON.stringify({
             rawData: result.data?.rawData,
-            claim: result.data?.claim
+            claim: result.data?.claim,
           }),
           schemaHash: metaData.schema?.schemaHash,
           issuerID: metaData.issuer.issuerId,
@@ -214,13 +260,11 @@ const Requestv2 = () => {
 
         //Auto backup
         //@ts-ignore
-        const backupKeys = keyContainer.generateKeyForBackup();
-        
-        
+        // const backupKeys = keyContainer.generateKeyForBackup();
+
         enqueueSnackbar("Get claim success!", {
           variant: "success",
         });
-        setLoading(false);
         history.push("/holder/identity");
       } catch (err) {
         setLoading(false);
@@ -233,7 +277,302 @@ const Requestv2 = () => {
         variant: "info",
       });
     }
+    setLoading(false);
   };
+
+  const checkClaimValidation = React.useCallback(
+    async (claimData: any, requirement: any) => {
+      try {
+        const schemas: any = await zidenPortal.get(
+          `/schemas/${requirement.schemaHash}`
+        );
+
+        const slotData = flattenData(
+          schema.schemaPropertiesSlot(schemas.data?.schema?.jsonSchema)
+        )[requirement.query.propertyName];
+
+        const challenge = BigInt(1);
+        if (isUnlocked && claimData) {
+          //get issuer claim from claim data
+          const issuerClaimArr = claimData.claim.claim.map((item: any) => {
+            return zidenUtils.hexToBuffer(item, 32);
+          });
+          try {
+            const issuerClaim = new Entry(issuerClaimArr);
+            const userTree = await keyContainer.getUserTree();
+            let sig: SignedChallenge;
+            const authClaims = keyContainer.getAuthClaims();
+            const parsedValue = requirement.query.value.map((item: any) =>
+              BigInt(item)
+            );
+
+            const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
+            const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
+            const signature = await auth.signChallenge(privateKey, challenge);
+            sig = {
+              challengeSignatureR8x: signature.challengeSignatureR8x,
+              challengeSignatureR8y: signature.challengeSignatureR8y,
+              challengeSignatureS: signature.challengeSignatureS,
+              challenge: challenge,
+            } as SignedChallenge;
+
+            const query: Query = {
+              slotIndex: slotData?.slot || 0,
+              operator: requirement.query.operator,
+              values: parsedValue,
+              valueTreeDepth: 6,
+              from: slotData?.begin || 0,
+              to: slotData?.end || 1,
+              timestamp: Date.now(),
+              claimSchema: BigInt(String(requirement.schemaHash)),
+            };
+            const privateKeyBuff = zidenUtils.hexToBuffer(
+              keyContainer.getKeyDecrypted().privateKey,
+              32
+            );
+            // const witness =
+            //   await queryMTP.holderGenerateQueryMTPWitnessWithSignature(
+            //     issuerClaim,
+            //     sig,
+            //     authClaims,
+            //     userTree,
+            //     parseIssuerClaimMtp(requirement.issuerClaimMtp),
+            //     parseNonRevMtp(requirement.nonRevMtp),
+            //     query
+            //   );
+            const witness =
+              await queryMTP.holderGenerateQueryMTPWitnessWithPrivateKey(
+                issuerClaim,
+                privateKeyBuff,
+                authClaims,
+                BigInt(1),
+                userTree,
+                parseIssuerClaimMtp(requirement.issuerClaimMtp),
+                parseNonRevMtp(requirement.nonRevMtp),
+                query
+              );
+
+            let resultWitness = { ...witness };
+
+            try {
+              const authPatchRes = (
+                await zidenIssuerNew.get(`/issuers/${userId}/lastest-state`)
+              ).data;
+              resultWitness.userClaimsRoot = BigInt(authPatchRes.claimsRoot);
+              resultWitness.userClaimRevRoot = BigInt(
+                authPatchRes.claimRevRoot
+              );
+              resultWitness.userState = BigInt(authPatchRes.expectedState);
+            } catch (err) {}
+            return {
+              witness: resultWitness,
+              valid: true,
+            };
+          } catch (err) {
+            return {
+              valid: false,
+              err: err,
+            };
+          }
+        }
+      } catch (err) {}
+    },
+    [keyContainer, isUnlocked, userId]
+  );
+
+  /**get all user claim */
+  useEffect(() => {
+    updateUserData();
+    const checkAllClaims = async () => {
+      const allClaims = getAllUserClaim();
+      if (!isUnlocked) {
+        enqueueSnackbar("please unlock your wallet", {
+          variant: "warning",
+          preventDuplicate: true,
+        });
+      } else {
+        const allClaimDecrypted = allClaims.map((item) => {
+          const dataDecrypted = keyContainer.decryptWithDataKey(
+            item.claimEncrypted
+          );
+          return {
+            id: item.id,
+            claim: JSON.parse(JSON.parse(dataDecrypted).claim),
+            issuerID: JSON.parse(dataDecrypted).issuerID,
+            schemaHash: JSON.parse(dataDecrypted).schemaHash,
+          };
+        });
+        setAllclaims(allClaimDecrypted);
+      }
+    };
+    checkAllClaims();
+  }, [isUnlocked, keyContainer, enqueueSnackbar, updateUserData]);
+
+  /**
+   *for each requirement:
+      filter all claim for:
+        - allowed issuers
+        - matching schema hashes
+        - publish status (if claim is on blocked chain yet)
+        - expire date (if claim has expired or not)
+        - check claim attesting value based on corresponding required operator:  matching, greater than, less than, in range, etc.
+      if pass, return nessesary claim data for generating proof
+    return an array of requirements and corresponding valid claim data , pass that array to processedRequireData state 
+   */
+  useEffect(() => {
+    const getUpdatedRequireData = async () => {
+      if (allClaims?.length > 0 && requirements?.length > 0) {
+        const updatedData = await Promise.all(
+          requirements.map(async (data: any) => {
+            for (var i = 0; i < allClaims.length; i++) {
+              try {
+                const claim = allClaims[i];
+                // check allow issuer ID
+                if (
+                  !data.allowedIssuers
+                    ?.map((issuer: any) => issuer.issuerId)
+                    .includes(claim.issuerID)
+                ) {
+                  continue;
+                }
+                // check schema hash
+                if (claim.schemaHash !== data.schemaHash) {
+                  continue;
+                }
+                //check claim mtp and nonrev mtp
+                let mtpInput, nonRevInput;
+                let flattenedRawData = flattenData(claim?.claim?.rawData);
+                try {
+                  const claimMtp = await zidenIssuerNew.get(
+                    `/claims/${claim.id}/proof?type=mtp`
+                  );
+                  mtpInput = claimMtp.data?.kycQueryMTPInput;
+                  const claimNonRevMtp = await zidenIssuerNew.get(
+                    `/claims/${claim.id}/proof?type=nonRevMtp`
+                  );
+                  nonRevInput = claimNonRevMtp.data?.kycQueryMTPInput;
+                } catch (err) {
+                  continue;
+                }
+                const dataToCheck = parseInt(flattenedRawData[data.name]);
+                // check expiration time
+                const issuerClaimArr = claim.claim?.claim?.map((item: any) => {
+                  return zidenUtils.hexToBuffer(item, 32);
+                });
+                const issuerClaim = new Entry(issuerClaimArr);
+                if (
+                  parseInt(issuerClaim.getExpirationDate().toString(10)) <
+                  Date.now()
+                ) {
+                  continue;
+                }
+
+                // check operator
+                switch (data.query.operator) {
+                  case 0:
+                    return {
+                      ...data,
+                      validClaim: claim,
+                      filled: "checked",
+                      issuerClaimMtp: mtpInput,
+                      nonRevMtp: nonRevInput,
+                    };
+                  case 1:
+                    if (dataToCheck === data.value[0]) {
+                      return {
+                        ...data,
+                        validClaim: claim,
+                        filled: "checked",
+                        issuerClaimMtp: mtpInput,
+                        nonRevMtp: nonRevInput,
+                      };
+                    }
+                    break;
+                  case 2:
+                    if (dataToCheck < data.value[0]) {
+                      return {
+                        ...data,
+                        validClaim: claim,
+                        filled: "checked",
+                        issuerClaimMtp: mtpInput,
+                        nonRevMtp: nonRevInput,
+                      };
+                    }
+                    break;
+                  case 3:
+                    if (dataToCheck > data.value[0]) {
+                      return {
+                        ...data,
+                        validClaim: claim,
+                        filled: "checked",
+                        issuerClaimMtp: mtpInput,
+                        nonRevMtp: nonRevInput,
+                      };
+                    }
+                    break;
+                  case 4:
+                    if (data.value.includes(dataToCheck)) {
+                      return {
+                        ...data,
+                        validClaim: claim,
+                        filled: "checked",
+                        issuerClaimMtp: mtpInput,
+                        nonRevMtp: nonRevInput,
+                      };
+                    }
+                    break;
+                  case 5:
+                    if (!data.value.includes(dataToCheck)) {
+                      return {
+                        ...data,
+                        validClaim: claim,
+                        filled: "checked",
+                        issuerClaimMtp: mtpInput,
+                        nonRevMtp: nonRevInput,
+                      };
+                    }
+                    break;
+                  case 6:
+                    if (
+                      data.value[0] <= dataToCheck &&
+                      dataToCheck <= data.value[1]
+                    ) {
+                      return {
+                        ...data,
+                        validClaim: claim,
+                        filled: "checked",
+                        issuerClaimMtp: mtpInput,
+                        nonRevMtp: nonRevInput,
+                      };
+                    }
+                    break;
+                  default:
+                    break;
+                }
+              } catch (error) {
+                continue;
+              }
+            }
+            return {
+              ...data,
+              filled: "notChecked",
+            };
+          })
+        );
+        setProcessedRequireData(updatedData);
+      } else {
+        const updatedData = requirements?.map((data: any) => {
+          return {
+            ...data,
+            filled: "notChecked",
+          };
+        });
+        setProcessedRequireData(updatedData);
+      }
+    };
+    getUpdatedRequireData();
+  }, [requirements, allClaims]);
+
   return (
     <>
       {metaData && (
@@ -341,6 +680,27 @@ const Requestv2 = () => {
                         Date.now() + metaData.expiration
                       ).toDateString()}
                     </Typography>
+                  </Box>
+                  <Box sx={infoStyle}>
+                    <Typography
+                      variant="body2"
+                      color="secondary"
+                      sx={{
+                        minWidth: "150px",
+                      }}
+                    >
+                      Requirements
+                    </Typography>
+                    <Box>
+                      {requirements.map((item, index: number) => {
+                        return (
+                          <Typography
+                            variant="body1"
+                            color="text.secondary"
+                          >{`- Description: ${item.attestation}, Request form: ${item.schema.name}`}</Typography>
+                        );
+                      })}
+                    </Box>
                   </Box>
                 </Box>
               </Grid>
@@ -659,6 +1019,33 @@ const Requestv2 = () => {
                         }
                       }
                     })}
+                  {!fetching && (
+                    <>
+                      <input
+                        style={{
+                          display: "none",
+                        }}
+                        type="file"
+                        accept="image/png, image/gif, image/jpeg"
+                        ref={inputRef}
+                        onChange={(e) => {
+                          // setImageFile()
+                          if (e.target.files) {
+                            setImageFile(e.target.files[0]);
+                          }
+                        }}
+                      />
+                      <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={() => {
+                          inputRef.current?.click();
+                        }}
+                      >
+                        Upload image
+                      </Button>
+                    </>
+                  )}
                   {!fetching && (
                     <Box
                       sx={{

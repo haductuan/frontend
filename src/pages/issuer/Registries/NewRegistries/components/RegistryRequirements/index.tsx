@@ -18,7 +18,6 @@ import ComparedValue from "./customComponents/ComparedValue";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 import { schema as zidenSchema } from "@zidendev/zidenjs";
-import { useVerifierContext } from "src/context/verifierContext";
 
 //type for requirements
 export interface requireType {
@@ -87,9 +86,7 @@ const RegistryRequirements = ({
   const [loading, setLoading] = useState(false);
   const network = 97;
   const [requirements, setRequirements] = React.useState<requirementsType>({});
-  const { isUnlocked, getZidenUserID, keyContainer, userId } =
-    useIdWalletContext();
-  const { verifierId } = useVerifierContext();
+  const { isUnlocked, getZidenUserID, keyContainer } = useIdWalletContext();
   const { enqueueSnackbar } = useSnackbar();
   const history = useHistory();
   //fetch data
@@ -534,20 +531,12 @@ const RegistryRequirements = ({
   //     });
   //   };
   //verify wallet id and jwz
-  React.useEffect(() => {
-    if (!isUnlocked) {
-      history.push("/verifier/profile/signin");
-    }
-  }, [isUnlocked, history]);
+
   //fetch data
   React.useEffect(() => {
     fetchAllSchema();
   }, [fetchAllSchema]);
-  React.useEffect(() => {
-    if (userId !== verifierId) {
-      history.push("/verifier/services");
-    }
-  }, [history, userId, verifierId]);
+
   return (
     <Box>
       {/* <Grid container spacing={2}>

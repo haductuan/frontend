@@ -32,7 +32,6 @@ import { Entry } from "@zidendev/zidenjs/build/claim/entry";
 import { useSnackbar } from "notistack";
 import LoadingComponent from "src/components/LoadingComponent";
 import { useDeviceContext } from "src/context/deviceContext";
-import { userType } from "src/constants";
 import { LoadingButton } from "@mui/lab";
 import AttestModal from "./components/AttestModal";
 import {
@@ -154,7 +153,7 @@ const Attestation = () => {
           const parsedValue = requirement.value.map((item: any) =>
             BigInt(item)
           );
-          
+
           const privateKeyHex = keyContainer.getKeyDecrypted().privateKey;
           const privateKey = zidenUtils.hexToBuffer(privateKeyHex, 32);
 
@@ -165,7 +164,7 @@ const Attestation = () => {
             challengeSignatureS: signature.challengeSignatureS,
             challenge: challenge,
           } as SignedChallenge;
-          
+
           const query: Query = {
             slotIndex: slotData?.slot || 0,
             operator: requirement.operator,
@@ -262,7 +261,6 @@ const Attestation = () => {
         setOpen(true);
         await handleConfirm();
       }
-      
     };
     actionOnStatus();
   }, [isSigning, geningProofStatus, checkUserType, handleConfirm]);
@@ -385,9 +383,9 @@ const Attestation = () => {
       filter all claim for:
         - allowed issuers
         - matching schema hashes
-        - publish status (if claim is on blocked yet)
+        - publish status (if claim is on blocked chain yet)
         - expire date (if claim has expired or not)
-        - check claim attesting value based on corresponding require operator:  matching, greater than, less than, in range etc.
+        - check claim attesting value based on corresponding required operator:  matching, greater than, less than, in range, etc.
       if pass, return nessesary claim data for generating proof
     return an array of requirements and corresponding valid claim data , pass that array to processedRequireData state 
    */

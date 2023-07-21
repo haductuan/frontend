@@ -76,6 +76,7 @@ export const generateProof = async (witness: any) => {
       (key, value) => (typeof value === "bigint" ? value.toString() : value) // return everything else unchanged
     )
   );
+
   try {
     const { proof, publicSignals } =
       // @ts-ignore
@@ -122,9 +123,9 @@ export const parseNonRevMtp = (input: any) => {
     issuerClaimNonRevMtp: input.issuerClaimNonRevMtp.map((item: any) =>
       BigInt(item)
     ),
-    issuerClaimNonRevMtpNoAux: input.issuerClaimNonRevMtpNoAux,
-    issuerClaimNonRevMtpAuxHi: input.issuerClaimNonRevMtpAuxHi,
-    issuerClaimNonRevMtpAuxHv: input.issuerClaimNonRevMtpAuxHv,
+    issuerClaimNonRevMtpNoAux: BigInt(input.issuerClaimNonRevMtpNoAux),
+    issuerClaimNonRevMtpAuxHi: BigInt(input.issuerClaimNonRevMtpAuxHi),
+    issuerClaimNonRevMtpAuxHv: BigInt(input.issuerClaimNonRevMtpAuxHv),
     issuerClaimNonRevAuthsRoot: BigInt(input.issuerClaimNonRevAuthsRoot),
     issuerClaimNonRevClaimsRoot: BigInt(input.issuerClaimNonRevClaimsRoot),
     issuerClaimNonRevClaimRevRoot: BigInt(input.issuerClaimNonRevClaimRevRoot),
