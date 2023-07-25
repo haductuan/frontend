@@ -176,7 +176,7 @@ const SideBar = () => {
             py: 3,
           }}
         >
-          <img
+          {/* <img
             src={isIpad || isMobile ? zidenIcon : ZidenLogo}
             alt={"ziden"}
             width={isIpad ? "41px" : "131px"}
@@ -184,7 +184,7 @@ const SideBar = () => {
             style={{
               opacity: isMobile ? 0 : 1,
             }}
-          />
+          /> */}
         </Box>
         <List>
           {navRoutes.map((route: any, index) => {

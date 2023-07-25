@@ -97,6 +97,7 @@ const Requestv2 = () => {
   const [helperText, setHelperText] = useState<any>({});
   const [requirements, setRequirements] = useState<Array<any>>([]);
   const [processedRequireData, setProcessedRequireData] = useState<any>();
+
   const [allClaims, setAllclaims] = useState<any>();
   const [imageFile, setImageFile] = useState<Blob>();
 
@@ -187,22 +188,25 @@ const Requestv2 = () => {
           return checkClaimValidation(item.validClaim, item);
         })
       );
+
       const proofs = await Promise.all(
-        witness.map(async (result) => {
-          if (result?.valid) {
-            try {
-              const resultProof = await generateProof(result.witness);
-              return {
-                proof: resultProof?.proof,
-                publicData: resultProof?.publicSignals,
-              };
-            } catch (err) {
-              throw err;
+        witness
+          .map(async (result) => {
+            if (result?.valid) {
+              try {
+                const resultProof = await generateProof(result.witness);
+                return {
+                  proof: resultProof?.proof,
+                  publicData: resultProof?.publicSignals,
+                };
+              } catch (err) {
+                throw err;
+              }
+            } else {
+              return null;
             }
-          } else {
-            return 2;
-          }
-        })
+          })
+          .map((res) => res)
       );
       setHelperText({});
 

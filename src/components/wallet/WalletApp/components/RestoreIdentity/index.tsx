@@ -123,8 +123,8 @@ const RestoreIdentity = () => {
           mb: 3,
         }}
       >
-        <img width={"83px"} height={"25px"} src={zidenLogo} alt="Ziden" />
-
+        {/* <img width={"83px"} height={"25px"} src={zidenLogo} alt="Ziden" /> */}
+        <Box></Box>
         <Button
           sx={{
             minWidth: "0px",

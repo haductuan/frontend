@@ -102,7 +102,8 @@ const UserAccount = () => {
             }}
           >
             {page === 0 ? (
-              <img width={"83px"} height={"25px"} src={zidenLogo} alt="Ziden" />
+              // <img width={"83px"} height={"25px"} src={zidenLogo} alt="Ziden" />
+              <Box></Box>
             ) : (
               <Button
                 sx={{

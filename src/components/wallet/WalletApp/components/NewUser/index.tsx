@@ -52,7 +52,13 @@ const NewUser = () => {
               />
             </Button>
           </Box>
-          <img width="150px" height="150px" src={zidenLogoOnly} alt={"Ziden"} />
+          {/* <img width="150px" height="150px" src={zidenLogoOnly} alt={"Ziden"} /> */}
+          {/* <Box
+            sx={{
+              width: "150px",
+              height: "150px",
+            }}
+          ></Box> */}
           <Typography
             sx={{
               color: "#114898",

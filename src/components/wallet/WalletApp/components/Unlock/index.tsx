@@ -71,7 +71,7 @@ const Unlock = () => {
               />
             </Button>
           </Box>
-          <img width="150px" height="150px" src={zidenLogoOnly} alt={"Ziden"} />
+          {/* <img width="150px" height="150px" src={zidenLogoOnly} alt={"Ziden"} /> */}
           <Typography
             sx={{
               color: "#114898",

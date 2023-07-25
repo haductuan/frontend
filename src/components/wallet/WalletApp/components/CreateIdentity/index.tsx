@@ -186,7 +186,12 @@ const CreateIdentity = ({ goBack }: createIdentityProps) => {
           mb: 3,
         }}
       >
-        <img width={"83px"} height={"25px"} src={zidenLogo} alt="Ziden" />
+        {/* <img width={"83px"} height={"25px"} src={zidenLogo} alt="Ziden" /> */}
+        <Box
+          sx={{
+            width: "83px",
+          }}
+        />
 
         <Button
           sx={{

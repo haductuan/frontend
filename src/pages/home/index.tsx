@@ -49,10 +49,10 @@ const Home = () => {
       sx={{
         width: "100%",
         minHeight: "100vh",
-        background: {
-          xs: "none",
-          sm: `transparent url(${homeBackground}) 0% 0% no-repeat padding-box`,
-        },
+        // background: {
+        //   xs: "none",
+        //   sm: `transparent url(${homeBackground}) 0% 0% no-repeat padding-box`,
+        // },
         backgroundSize: {
           sm: "432px 432px",
           md: "50% auto",
@@ -121,7 +121,7 @@ const Home = () => {
         >
           <img src={homeBackground} alt="" width="100%" height="100%" />
         </Box>
-        <Box
+        {/* <Box
           sx={{
             mt: 5,
             display: "flex",
@@ -160,8 +160,8 @@ const Home = () => {
           <a target={"blank"} href="https://blog.ziden.io/">
             <MediumIcon sx={{ ml: "20px" }} />
           </a>
-        </Box>
-        <Box
+        </Box> */}
+        {/* <Box
           sx={{
             mt: {
               sm: 22,
@@ -188,9 +188,9 @@ const Home = () => {
             src="https://www.youtube.com/embed/b-an-6akg3I?autoplay=0&mute=0"
             allow="fullscreen"
           />
-        </Box>
+        </Box> */}
       </Box>
-      <Box
+      {/* <Box
         sx={{
           px: {
             xs: 1,
@@ -353,7 +353,7 @@ const Home = () => {
             );
           })}
         </Grid>
-      </Box>
+      </Box> */}
     </Box>
   );
 };
