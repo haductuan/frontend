@@ -34,8 +34,7 @@ const IdentityDetail = ({
 }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const { enqueueSnackbar } = useSnackbar();
-  const { keyContainer, getZidenUserID } =
-    useIdWalletContext();
+  const { keyContainer, getZidenUserID } = useIdWalletContext();
 
   const handleClaim = async () => {
     try {
@@ -53,7 +52,7 @@ const IdentityDetail = ({
       const localDB = keyContainer.db;
       //save to local storage
       localDB.insert(`ziden-user-claims/${data?.id}`, dataEncrypted);
-      
+
       enqueueSnackbar("Get claim success!", {
         variant: "success",
       });
@@ -73,7 +72,7 @@ const IdentityDetail = ({
               color: theme.palette.text.secondary,
             })}
           >
-            <Typography variant="h6" pb={2} pt={4}>
+            <Typography variant="h6" pb={2} pt={4} color={"text.primary"}>
               Information
             </Typography>
             <Grid container spacing={5}>
@@ -104,7 +103,11 @@ const IdentityDetail = ({
                   >
                     Issuer
                   </Typography>
-                  <Typography flexWrap={"wrap"} variant="body2">
+                  <Typography
+                    flexWrap={"wrap"}
+                    variant="body2"
+                    color={"text.primary"}
+                  >
                     {truncateString(data.issuerID, 20)}
                   </Typography>
                 </Box>
@@ -138,7 +141,7 @@ const IdentityDetail = ({
                   >
                     Version
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" color={"text.primary"}>
                     {data.version ? BigInt(data.version).toString() : 1}
                   </Typography>
                 </Box>
@@ -153,7 +156,7 @@ const IdentityDetail = ({
                   >
                     Updatable
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" color={"text.primary"}>
                     {data.updateable ? "Yes" : "No"}
                   </Typography>
                 </Box>
@@ -168,7 +171,7 @@ const IdentityDetail = ({
                   >
                     Expiration date
                   </Typography>
-                  <Typography variant="body2">
+                  <Typography variant="body2" color={"text.primary"}>
                     {new Date(data.expireDate)?.toDateString()}
                   </Typography>
                 </Box>
@@ -180,7 +183,7 @@ const IdentityDetail = ({
               color: theme.palette.text.secondary,
             })}
           >
-            <Typography variant="h6" pb={2} pt={4}>
+            <Typography variant="h6" pb={2} pt={4} color={"text.primary"}>
               Properties
             </Typography>
             {!data?.claim?.rawData?.individualRecords &&
@@ -224,7 +227,10 @@ const IdentityDetail = ({
                                 >
                                   {capitalizeFirstLetter(subItem)}
                                 </Typography>
-                                <Typography variant="body2">
+                                <Typography
+                                  variant="body2"
+                                  color={"text.primary"}
+                                >
                                   {truncateString(displayData, 20)}
                                 </Typography>
                               </Box>
@@ -247,7 +253,7 @@ const IdentityDetail = ({
                         >
                           {parseLabel(item)}
                         </Typography>
-                        <Typography variant="body2">
+                        <Typography variant="body2" color={"text.primary"}>
                           {truncateString(data?.claim?.rawData[item], 20)}
                         </Typography>
                       </Box>

@@ -76,7 +76,7 @@ const Header = ({
       id="ziden-header"
       sx={[
         (theme) => ({
-          backgroundColor: theme.palette.primary.main,
+          backgroundColor: theme.palette.background.header,
           width: "100%",
           px: {
             xs: 2,
@@ -151,7 +151,7 @@ const Header = ({
                 lg: "40px",
               },
               "#ziden-wallet": {
-                backgroundColor: "#0C3F89",
+                backgroundColor: "#FFC251",
               },
             }}
           >
@@ -178,11 +178,11 @@ const Header = ({
                 // flexGrow: 1,
               }}
             >
-              <Typography variant="h1" color="#F7A088">
+              <Typography variant="h1" color={"text.secondary"}>
                 {title1}
               </Typography>
               {title2 && (
-                <Typography variant="h2" color="#F7A088">
+                <Typography variant="h2" color={"text.secondary"}>
                   {title2}
                 </Typography>
               )}
@@ -204,6 +204,7 @@ const Header = ({
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-end",
+                opacity: 0,
               }}
             >
               {description?.map((data: any, index: number) => {
@@ -212,9 +213,9 @@ const Header = ({
                     key={data + index}
                     variant="body2"
                     sx={{
-                      color: "#FFFFFC",
                       opacity: 0.75,
                     }}
+                    color={"text.secondary"}
                   >
                     {data}
                   </Typography>

@@ -22,12 +22,12 @@ export const LayoutOptions = {
 export type LayoutType = "BlankLayout" | "MainLayout";
 
 export default [
-  {
-    path: "/getting-started",
-    exact: true,
-    component: React.lazy(() => import("src/pages/home")),
-    layout: LayoutOptions.MAIN,
-  },
+  // {
+  //   path: "/getting-started",
+  //   exact: true,
+  //   component: React.lazy(() => import("src/pages/home")),
+  //   layout: LayoutOptions.MAIN,
+  // },
   {
     path: "/holder/identity",
     exact: true,
@@ -230,6 +230,7 @@ export default [
     path: "/",
     exact: true,
     redirect: true,
-    to: "/getting-started",
+    // to: "/getting-started",
+    to: "/holder",
   },
 ] as RouteConfig[];

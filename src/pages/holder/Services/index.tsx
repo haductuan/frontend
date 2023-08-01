@@ -154,9 +154,10 @@ const Services = () => {
               return (
                 <Accordion
                   key={index}
-                  sx={{
+                  sx={(theme) => ({
                     "& .MuiAccordionSummary-root": {
-                      background: "#FFFEFC 0% 0% no-repeat padding-box",
+                      // background: "#FFFEFC 0% 0% no-repeat padding-box",
+                      backgroundColor: theme.palette.background.default,
                       borderRadius: 4,
                       px: {
                         xs: 3,
@@ -165,7 +166,7 @@ const Services = () => {
                       },
                     },
                     "& .MuiAccordionSummary-root.Mui-expanded": {
-                      background: "#114898 0% 0% no-repeat padding-box",
+                      backgroundColor: theme.palette.background.header,
                     },
                     "&.MuiPaper-root": {
                       borderRadius: 4,
@@ -187,7 +188,7 @@ const Services = () => {
                       border: "1px solid #FFFFFF",
                     },
                     mb: 3,
-                  }}
+                  })}
                 >
                   <AccordionSummary
                     expandIcon={
@@ -433,14 +434,17 @@ const Services = () => {
                                   <Tooltip
                                     placement="bottom"
                                     title={
-                                      <Typography variant="body2">
+                                      <Typography
+                                        variant="body2"
+                                        color={"text.primary"}
+                                      >
                                         {item.title}
                                       </Typography>
                                     }
                                   >
                                     <Typography
                                       variant="h6"
-                                      color="text.secondary"
+                                      color="text.primary"
                                     >
                                       {item.title}
                                     </Typography>
@@ -450,14 +454,17 @@ const Services = () => {
                                   <Tooltip
                                     placement="bottom"
                                     title={
-                                      <Typography variant="body2">
+                                      <Typography
+                                        variant="body2"
+                                        color={"text.primary"}
+                                      >
                                         {item.attestation}
                                       </Typography>
                                     }
                                   >
                                     <Typography
                                       variant="h6"
-                                      color="text.secondary"
+                                      color="text.primary"
                                     >
                                       {item.attestation}
                                     </Typography>

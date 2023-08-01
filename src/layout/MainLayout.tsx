@@ -21,16 +21,16 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       </Box>
       <Box
         sx={(theme) => ({
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: theme.palette.background.default,
           overflowX: "scroll",
           width: "100%",
-          backgroundImage: {
-            xs: "#",
-            xsm:
-              location.pathname === "/getting-started"
-                ? "none"
-                : `url(${bgImage})`,
-          },
+          // backgroundImage: {
+          //   xs: "#",
+          //   xsm:
+          //     location.pathname === "/getting-started"
+          //       ? "none"
+          //       : `url(${bgImage})`,
+          // },
           backgroundAttachment: "fixed",
           backgroundRepeat: "no-repeat",
           backgroundPosition: {

@@ -33,13 +33,13 @@ const SideBar = () => {
   }, [isIpad, isDesktop]);
 
   const navRoutes = [
-    {
-      name: "Getting Started",
-      subMenu: false,
-      to: "/getting-started",
-      icon: <GetStartIcon />,
-      disable: false,
-    },
+    // {
+    //   name: "Getting Started",
+    //   subMenu: false,
+    //   to: "/getting-started",
+    //   icon: <GetStartIcon />,
+    //   disable: false,
+    // },
     {
       name: "Holder",
       subMenu: true,
@@ -121,14 +121,14 @@ const SideBar = () => {
       ],
       icon: <PortalsIcon />,
     },
-    {
-      name: "Docs",
-      subMenu: false,
-      to: "https://docs.ziden.io/",
-      icon: <DocumentIcon />,
-      disable: false,
-      newTab: true,
-    },
+    // {
+    //   name: "Docs",
+    //   subMenu: false,
+    //   to: "https://docs.ziden.io/",
+    //   icon: <DocumentIcon />,
+    //   disable: false,
+    //   newTab: true,
+    // },
   ];
   const popUpMessage = (message: string) => {
     enqueueSnackbar(message, {
@@ -162,7 +162,7 @@ const SideBar = () => {
               md: "110px",
               lg: "230px",
             },
-            backgroundColor: "#FEF7F2",
+            backgroundColor: "#FDF6EB",
             boxSizing: "border-box",
             border: "none",
           },

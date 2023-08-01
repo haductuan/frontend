@@ -4,7 +4,6 @@ import {
   createTheme,
   CssBaseline,
   responsiveFontSizes,
-  Theme,
   ThemeProvider,
 } from "@mui/material";
 // import { useAppContext } from "./context/app-context";
@@ -40,6 +39,8 @@ declare module "@mui/material/styles/createPalette" {
     primary: string;
     secondary: string;
     paperA75: string;
+    header: string;
+    sideBar: string;
   }
 }
 
@@ -121,11 +122,12 @@ export default function Themes(props: any) {
           },
           palette: {
             background: {
-              paper: "#FFFFFC",
+              paper: "#f5f5f5",
               default: "#FFFFFF",
+              header: "#B36643",
             },
             primary: {
-              main: "#114898",
+              main: "#000000",
               light: "#00D6F2",
               contrastText: "#FFFFFC",
             },
@@ -135,8 +137,8 @@ export default function Themes(props: any) {
               contrastText: "#F7A088",
             },
             text: {
-              primary: "#114898",
-              secondary: "#000D1C",
+              primary: "#000000",
+              secondary: "#000000",
             },
           },
           components: {
@@ -155,8 +157,8 @@ export default function Themes(props: any) {
                   minWidth: "80px",
                 },
                 contained: {
-                  backgroundColor: "#114898",
-                  color: "#FFFFFF",
+                  backgroundColor: "#FFC251",
+                  color: "#000000",
                   fontWeight: 600,
                   minHeight: "36px",
                   minWidth: "80px",
@@ -168,8 +170,8 @@ export default function Themes(props: any) {
                   minHeight: "36px",
                 },
                 containedSecondary: {
-                  backgroundColor: "#F7A088",
-                  color: "#FFFFFC",
+                  backgroundColor: "#FFC251",
+                  color: "#000000",
                   fontWeight: 600,
                   minHeight: "36px",
                   minWidth: "80px",
