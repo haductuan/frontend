@@ -68,7 +68,7 @@ const NewUser = () => {
               py: 2,
             }}
           >
-            New to Ziden?
+            Login by DID
           </Typography>
           <Button
             id="demo-create-account"
