@@ -178,9 +178,22 @@ const SignIn = () => {
     } else {
       const fetchIssuer = async () => {
         const issuerData = await backendServer.get("/issuers");
-        if (issuerData.data?.issuers?.length > 0) {
+        const userID = await getZidenUserID();        
+        const issuerMap = await issuerServerNew.get(`/issuers?operatorId=${userID}`);
+        let issuerIdList = [];
+        for (let i = 0; i < issuerMap.data?.length; i++) {
+          issuerIdList.push(issuerMap.data[i].issuerId);
+        }
+        let issuerDataFeatch = [];
+        for (let i = 0; i < issuerData.data?.issuers?.length; i++) {
+          let item = issuerData.data.issuers[i];
+          if (issuerIdList.includes(item.issuerId)) {
+            issuerDataFeatch.push(item);
+          }
+        }
+        if (issuerDataFeatch.length > 0) {
           setIssuers(
-            issuerData.data?.issuers.map((item: any) => {
+            issuerDataFeatch.map((item: any) => {
               return {
                 label: item.name || "",
                 value: { id: item.issuerId || "", endpoint: item.endpointUrl },

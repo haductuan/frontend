@@ -186,7 +186,8 @@ const SignIn = () => {
       history.push("/verifier/detail");
     } else {
       const fetchVerifier = async () => {
-        const verifierData = (await backendServer.get("/verifiers")).data;
+        const userID = await getZidenUserID();        
+        const verifierData = (await backendServer.get(`/verifiers?operatorId=${userID}`)).data;
         setVerifier(
           verifierData?.verifiers?.map((verifier: any, inex: number) => {
             return {
