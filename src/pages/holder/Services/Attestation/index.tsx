@@ -313,12 +313,14 @@ const Attestation = () => {
       //set require Data
       const requirements = serviceDetail?.data?.service?.requirements?.map(
         (requirement: any, index: number) => {
+          console.log("🚀 ~ file: index.tsx:333 ~ fetchRequireData ~ requirement:", requirement)
           return {
             name: requirement.query.propertyName,
             displayName: requirement.title,
             require: requirement.attestation,
             issuerID: requirement.allowedIssuers,
             schemaHash: requirement.schemaHash,
+            schemaName: requirement.schema.name,
             filled: "checking",
             launch: (
               <Button
@@ -735,7 +737,7 @@ const Attestation = () => {
                     p: 3,
                     boxShadow: "0px 2px 8px #0000001F",
                     borderRadius: 4,
-                    height: "500px",
+                    minHeight: "500px",
                   }}
                 >
                   <RequirementDetail
@@ -878,7 +880,7 @@ const Attestation = () => {
             pr: 1,
           }}
         >
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             sx={{
@@ -888,7 +890,7 @@ const Attestation = () => {
             onClick={handleGetResult}
           >
             Get verification result
-          </Button>
+          </Button> */}
           <LoadingButton
             loading={
               geningProofStatus === AttestStatus.Executing ||

@@ -50,10 +50,13 @@ const Services = () => {
                 title: item.name || "",
                 requirements: item.requirements?.map(
                   (requirement: any, index: number) => {
+                    console.log("🚀 ~ file: index.tsx:53 ~ .map ~ requirement:", requirement)
+                    
                     return {
                       attestation: requirement.attestation,
                       title: requirement.title,
                       schemaHash: requirement.schemaHash,
+                      schemaName: requirement.schema.name,
                     };
                   }
                 ),

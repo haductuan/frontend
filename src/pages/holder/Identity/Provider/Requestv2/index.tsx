@@ -185,6 +185,7 @@ const Requestv2 = () => {
       setLoading(true);
       const witness = await Promise.all(
         processedRequireData.map(async (item: any) => {
+
           return checkClaimValidation(item.validClaim, item);
         })
       );
@@ -208,6 +209,7 @@ const Requestv2 = () => {
           })
           .map((res) => res)
       );
+      console.log("🚀 ~ file: index.tsx:211 ~ handleConfirm ~ proofs:", proofs)
       setHelperText({});
 
       try {
@@ -458,7 +460,7 @@ const Requestv2 = () => {
                 } catch (err) {
                   continue;
                 }
-                const dataToCheck = parseInt(flattenedRawData[data.name]);
+                const dataToCheck = parseInt(flattenedRawData[data.query.propertyName]);
                 // check expiration time
                 const issuerClaimArr = claim.claim?.claim?.map((item: any) => {
                   return zidenUtils.hexToBuffer(item, 32);
@@ -482,7 +484,7 @@ const Requestv2 = () => {
                       nonRevMtp: nonRevInput,
                     };
                   case 1:
-                    if (dataToCheck === data.value[0]) {
+                    if (dataToCheck === data.query.value[0]) {
                       return {
                         ...data,
                         validClaim: claim,
@@ -493,7 +495,7 @@ const Requestv2 = () => {
                     }
                     break;
                   case 2:
-                    if (dataToCheck < data.value[0]) {
+                    if (dataToCheck < data.query.value[0]) {
                       return {
                         ...data,
                         validClaim: claim,
@@ -504,7 +506,7 @@ const Requestv2 = () => {
                     }
                     break;
                   case 3:
-                    if (dataToCheck > data.value[0]) {
+                    if (dataToCheck > data.query.value[0]) {
                       return {
                         ...data,
                         validClaim: claim,
@@ -515,7 +517,7 @@ const Requestv2 = () => {
                     }
                     break;
                   case 4:
-                    if (data.value.includes(dataToCheck)) {
+                    if (data.query.value.includes(dataToCheck)) {
                       return {
                         ...data,
                         validClaim: claim,
@@ -526,7 +528,7 @@ const Requestv2 = () => {
                     }
                     break;
                   case 5:
-                    if (!data.value.includes(dataToCheck)) {
+                    if (!data.query.value.includes(dataToCheck)) {
                       return {
                         ...data,
                         validClaim: claim,
@@ -538,7 +540,7 @@ const Requestv2 = () => {
                     break;
                   case 6:
                     if (
-                      data.value[0] <= dataToCheck &&
+                      data.query.value[0] <= dataToCheck &&
                       dataToCheck <= data.value[1]
                     ) {
                       return {
@@ -554,6 +556,7 @@ const Requestv2 = () => {
                     break;
                 }
               } catch (error) {
+                console.log("🚀 ~ file: index.tsx:563 ~ requirements.map ~ error:", error)
                 continue;
               }
             }
@@ -697,11 +700,16 @@ const Requestv2 = () => {
                     </Typography>
                     <Box>
                       {requirements.map((item, index: number) => {
+                        let issueBy = [];
+                        for (let i = 0; i < item.allowedIssuers.length; i++) {
+                          issueBy.push(item.allowedIssuers[i].name);
+                        }
+
                         return (
                           <Typography
                             variant="body1"
                             color="text.secondary"
-                          >{`- Description: ${item.attestation}, Request form: ${item.schema.name}`}</Typography>
+                          >{`- Description: ${item.attestation}; Schema: ${item.schema.name}; Issue By: ${issueBy}`}</Typography>
                         );
                       })}
                     </Box>

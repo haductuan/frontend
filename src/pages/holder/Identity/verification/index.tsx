@@ -55,12 +55,14 @@ const Verification = () => {
       });
       const requirements = serviceDetail?.service?.requirements?.map(
         (requirement: any, index: number) => {
+          console.log("🚀 ~ file: index.tsx:58 ~ fetchData ~ requirement:", requirement)
           return {
             name: requirement.query.propertyName,
             displayName: requirement.title,
             require: requirement.attestation,
             issuerID: requirement.allowedIssuers,
             schemaHash: requirement.schemaHash,
+            schemaName: requirement.schema.name,
             filled: "checking",
             value: requirement.query.value,
             operator: requirement.query.operator,

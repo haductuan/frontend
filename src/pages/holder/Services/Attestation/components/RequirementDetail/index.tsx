@@ -5,6 +5,9 @@ import { CheckIcon, DotLoadingIcon, NotCheckIcon } from "src/constants/icon";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 
 const RequirementDetail = ({ detailData }: any) => {
+  console.log("🚀 ~ file: index.tsx:8 ~ RequirementDetail ~ detailData:", detailData)
+  const OPERATOR_TYPE = ["Existed", "Matching", "Upper bound", "Greater than", "Membership", "Non-Membership", "In range"];
+
   const { isUnlocked } = useIdWalletContext();
   const rowStyle = (theme: any) => {
     return {
@@ -104,7 +107,85 @@ const RequirementDetail = ({ detailData }: any) => {
                   wordBreak: "break-word",
                 }}
               >
-                {detailData.schemaHash || ""}
+                {detailData.schemaName || ""}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container sx={rowStyle}>
+            <Grid item xs={4} sm={3}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: 500,
+                }}
+                color="text.secondary"
+              >
+                Property
+              </Typography>
+            </Grid>
+            <Grid item xs={8} sm={9}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                ml={2}
+                fontWeight={400}
+                sx={{
+                  width: "100%",
+                }}
+              >
+                {detailData.name || ""}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container sx={rowStyle}>
+            <Grid item xs={4} sm={3}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: 500,
+                }}
+                color="text.secondary"
+              >
+                Query
+              </Typography>
+            </Grid>
+            <Grid item xs={8} sm={9}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                ml={2}
+                fontWeight={400}
+                sx={{
+                  width: "100%",
+                }}
+              >
+                {OPERATOR_TYPE[detailData.operator] || ""}
+              </Typography>
+            </Grid>
+          </Grid>
+          <Grid container sx={rowStyle}>
+            <Grid item xs={4} sm={3}>
+              <Typography
+                variant="body1"
+                sx={{
+                  fontWeight: 500,
+                }}
+                color="text.secondary"
+              >
+                Value
+              </Typography>
+            </Grid>
+            <Grid item xs={8} sm={9}>
+              <Typography
+                variant="body1"
+                color="text.secondary"
+                ml={2}
+                fontWeight={400}
+                sx={{
+                  width: "100%",
+                }}
+              >
+                {detailData.value.join(', ') || ""}
               </Typography>
             </Grid>
           </Grid>
