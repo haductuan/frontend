@@ -21,7 +21,7 @@ import { NavLink, useHistory } from "react-router-dom";
 import Header from "src/components/Header";
 import ServiceDetail from "./components/ServiceDetail";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { useVerifierContext } from "src/context/verifierContext";
 import { truncateString } from "src/utils/wallet/walletUtils";
 import { LoadingButton } from "@mui/lab";
@@ -136,7 +136,7 @@ const Services = () => {
     if (isUnlocked) {
       try {
         const res = (
-          await zidenPortal.get(`/services?verifierId=${verifierId}`)
+          await backendServer.get(`/services?verifierId=${verifierId}`)
         ).data;
         setTableData(res.services || []);
       } catch (err) {}
@@ -145,7 +145,7 @@ const Services = () => {
   const toogleActive = async (id: string) => {
     addLoadingService(id);
     const jwz = keyContainer.db.get("verifier-jwz");
-    await zidenPortal.put(
+    await backendServer.put(
       `/services/${id}/active`,
       {},
       {
@@ -175,7 +175,7 @@ const Services = () => {
     } else {
       const validate = async () => {
         const validateResult = await validateJWZ(
-          zidenPortal.getUri(),
+          backendServer.getUri(),
           "verifier"
         );
         if (!validateResult) {

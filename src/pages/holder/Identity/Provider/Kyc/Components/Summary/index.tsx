@@ -8,7 +8,7 @@ import { displayTitle } from "src/context/PortalContext";
 import { useKYCContext } from "src/context/kyc-context";
 import { parseLabel } from "src/utils/claim";
 import { LoadingButton } from "@mui/lab";
-import { zidenIssuerNew, zidenKYC } from "src/client/api";
+import { issuerServerNew, zidenKYC } from "src/client/api";
 import { useParams } from "react-router-dom";
 import { userType } from "src/constants";
 
@@ -52,7 +52,7 @@ const Summary = () => {
     try {
       const libsodium = keyContainer.getCryptoUtil();
       const userID = await getZidenUserID();
-      const result = await zidenIssuerNew.post(
+      const result = await issuerServerNew.post(
         `/claims/request/${metaData?.issuerId}`,
         {
           holderId: userID,

@@ -10,7 +10,7 @@ import { validateJWZ } from "src/utils/auth";
 import { utils as zidenjsUtils } from "@zidendev/zidenjs";
 import axios from "axios";
 import { LoadingButton } from "@mui/lab";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { userType } from "src/constants";
 //shared Style
 const rowStyle = (theme: any) => {
@@ -57,7 +57,7 @@ const Register = () => {
       "endpointUrl",
       endpointUrl ? endpointUrl : "https://issuer-staging.ziden.io/api/v1"
     );
-    await zidenPortal.post("/issuers/registration", data);
+    await backendServer.post("/issuers/registration", data);
   };
   const handleRegister = async () => {
     if (isUnlocked) {

@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 
 import React, { useState, useRef } from "react";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { EditIcon, UploadIcon } from "src/constants/icon";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { useIssuerContext } from "src/context/issuerContext";
@@ -80,7 +80,7 @@ const EditInfoForm = ({ hanldeClose }: any) => {
       if (logo) {
         bodyData.append("issuerLogo", logo);
       }
-      await zidenPortal.post(`/issuers/${issuerID}`, bodyData, {
+      await backendServer.post(`/issuers/${issuerID}`, bodyData, {
         headers: {
           Authorization: `${jwz}`,
         },

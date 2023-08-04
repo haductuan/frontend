@@ -8,7 +8,7 @@ import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { useSnackbar } from "notistack";
 import { validateJWZ } from "src/utils/auth";
 import { LoadingButton } from "@mui/lab";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 //shared Style
 const rowStyle = (theme: any) => {
   return {
@@ -46,7 +46,7 @@ const Register = () => {
       data.append("verifierLogo", logo);
       data.append("contact", contact);
       data.append("website", website);
-      await zidenPortal.post("/verifiers/registration", data);
+      await backendServer.post("/verifiers/registration", data);
     } catch (err) {
       throw Error("Register failed");
     }
@@ -127,7 +127,7 @@ const Register = () => {
     ) {
       const validate = async () => {
         const validateResult = await validateJWZ(
-          zidenPortal.getUri(),
+          backendServer.getUri(),
           "verifier"
         );
         if (validateResult) {

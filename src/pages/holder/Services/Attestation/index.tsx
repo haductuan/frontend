@@ -25,7 +25,7 @@ import {
 import launchIcon from "src/assets/image/icons/lauch2x.png";
 
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { zidenIssuerNew, zidenPortal } from "src/client/api";
+import { issuerServerNew, backendServer } from "src/client/api";
 import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import { utils as zidenUtils } from "@zidendev/zidenjs";
 import { Entry } from "@zidendev/zidenjs/build/claim/entry";
@@ -106,7 +106,7 @@ const Attestation = () => {
       setVerifyStatus(AttestStatus.Executing);
       if (proofs && proofs.zkProofs.length > 0) {
         try {
-          const res = await zidenPortal.post("/proofs/submit", proofs);
+          const res = await backendServer.post("/proofs/submit", proofs);
           if (res.data.results[0] === true) {
             setVerifyStatus(AttestStatus.Success);
             enqueueSnackbar(`Generate proof successfuly`, {
@@ -133,7 +133,7 @@ const Attestation = () => {
    */
   const checkClaimValidation = React.useCallback(
     async (claimData: any, requirement: any) => {
-      const schemas: any = await zidenPortal.get(
+      const schemas: any = await backendServer.get(
         `/schemas/${requirement.schemaHash}`
       );
       const slotData = flattenData(
@@ -188,7 +188,7 @@ const Attestation = () => {
           let resultWitness = { ...witness };
           try {
             const authPatchRes = (
-              await zidenIssuerNew.get(`/issuers/${userId}/lastest-state`)
+              await issuerServerNew.get(`/issuers/${userId}/lastest-state`)
             ).data;
             resultWitness.userClaimsRoot = BigInt(authPatchRes.claimsRoot);
             resultWitness.userClaimRevRoot = BigInt(authPatchRes.claimRevRoot);
@@ -270,7 +270,7 @@ const Attestation = () => {
    */
   const handleLaunch = React.useCallback(
     async (schemaHash: string, allowedIssuers: Array<string>) => {
-      const allRegistries = await zidenPortal.get(
+      const allRegistries = await backendServer.get(
         `/registries?schemaHash=${schemaHash}`
       );
       for (const registry of allRegistries.data?.registries) {
@@ -291,17 +291,17 @@ const Attestation = () => {
       let reqId: any =
         queryString.parse(history.location.search)["requestId"] || "";
       if (reqId) {
-        const res = await zidenPortal.get(`/proofs/${reqId}`);
+        const res = await backendServer.get(`/proofs/${reqId}`);
         if (res.data) {
           setRequestData(res.data.request);
         }
       } else {
-        const res = await zidenPortal.post(`/proofs/request`, {
+        const res = await backendServer.post(`/proofs/request`, {
           serviceId: param.id,
         });
         setRequestData(res.data.request);
       }
-      const serviceDetail = await zidenPortal.get(`services/${param.id}`);
+      const serviceDetail = await backendServer.get(`services/${param.id}`);
       setProviderData({
         title: serviceDetail?.data?.service?.name,
         description: serviceDetail?.data?.service?.description,
@@ -412,11 +412,11 @@ const Attestation = () => {
               let mtpInput, nonRevInput;
               let flattenedRawData = flattenData(claim?.claim?.rawData);
               try {
-                const claimMtp = await zidenIssuerNew.get(
+                const claimMtp = await issuerServerNew.get(
                   `/claims/${claim.id}/proof?type=mtp`
                 );
                 mtpInput = claimMtp.data?.kycQueryMTPInput;
-                const claimNonRevMtp = await zidenIssuerNew.get(
+                const claimNonRevMtp = await issuerServerNew.get(
                   `/claims/${claim.id}/proof?type=nonRevMtp`
                 );
                 nonRevInput = claimNonRevMtp.data?.kycQueryMTPInput;

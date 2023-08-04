@@ -25,7 +25,7 @@ import { validateJWZ } from "src/utils/auth";
 import LoadingComponent from "src/components/LoadingComponent";
 import axios from "axios";
 import { EmptyIcon } from "src/constants/icon";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 const cellDataStyle = (theme: any) => {
   return {
     maxWidth: {
@@ -72,7 +72,7 @@ const Schemas = () => {
   const showDetailSchema = async (schameData: any) => {
     setOpen(true);
     const schemaDetailResult = (
-      await zidenPortal.get(`schemas/${schameData?.schema?.hash}`)
+      await backendServer.get(`schemas/${schameData?.schema?.hash}`)
     ).data.schema.jsonSchema;
     const schemaDetailData = {
       general: {

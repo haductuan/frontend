@@ -15,7 +15,7 @@ import { useState } from "react";
 //icon
 import ProviderDetail from "src/components/ProviderDetail";
 import { useDeviceContext } from "src/context/deviceContext";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { ArrowDownIcon, ArrowRightIcon } from "src/constants/icon";
 import LoadingProvider from "../components/LoadingProvider";
@@ -32,7 +32,7 @@ const IdentityProvider = () => {
     // updateUserData();
     setLoading(true);
     try {
-      zidenPortal.get("/issuers").then((res) => {
+      backendServer.get("/issuers").then((res) => {
         setProviders(res.data.issuers);
         setLoading(false);
       });

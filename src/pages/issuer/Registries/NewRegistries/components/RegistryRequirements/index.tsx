@@ -12,7 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import React, { useState } from "react";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { NavLink, useHistory } from "react-router-dom";
-import { zidenIssuerNew, zidenPortal } from "src/client/api";
+import { issuerServerNew, backendServer } from "src/client/api";
 import { FormTypeMapping, parseLabel } from "src/utils/claim";
 import ComparedValue from "./customComponents/ComparedValue";
 import { useSnackbar } from "notistack";
@@ -92,7 +92,7 @@ const RegistryRequirements = ({
   //fetch data
 
   const fetchAllSchema = React.useCallback(async () => {
-    const res = (await zidenPortal.get("/schemas")).data;
+    const res = (await backendServer.get("/schemas")).data;
     setAllSchema(
       res?.schemas?.map((schema: any, index: number) => {
         return {
@@ -241,11 +241,11 @@ const RegistryRequirements = ({
     handleUpdateOption(id, "property", []);
     handleUpdateOption(id, "allowedIssuers", []);
     //fetch issuer
-    const issuerResponse = await zidenPortal.get(
+    const issuerResponse = await backendServer.get(
       `/issuers?schemaHashes=${schema.schemaHash}&networks=${network}`
     );
     const jsonSchema = zidenSchema.getInputSchema(
-      (await zidenPortal.get(`schemas/${schema.hash}`)).data?.schema?.jsonSchema
+      (await backendServer.get(`schemas/${schema.hash}`)).data?.schema?.jsonSchema
     );
     handleUpdateOption(
       id,
@@ -495,13 +495,15 @@ const RegistryRequirements = ({
             }
           );
         }
-        await zidenIssuerNew.post(
+        console.log("🚀 ~ file: index.tsx:504 ~ handleConfirm ~ newSchemaData:", newSchemaData)
+
+        await issuerServerNew.post(
           "/registries",
           {
             schemaHash: newSchemaData["schemaHash"],
             issuerId: issuerId,
             description: newSchemaData.registry?.description,
-            expiration: 0,
+            expiration: Number(newSchemaData.registry?.expiration),
             updatetable: false,
             networkId: 97,
             endpointUrl: newSchemaData.registry?.endpointUrl,

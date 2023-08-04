@@ -15,7 +15,7 @@ import { userKYCDataType } from "src/context/context";
 import { useKYCContext } from "src/context/kyc-context";
 import { useParams } from "react-router-dom";
 import { schema as zidenSchema } from "@zidendev/zidenjs";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { dataTypeMaping, parseLabel } from "src/utils/claim";
 
 const NationalIDForm = () => {
@@ -91,11 +91,11 @@ const NationalIDForm = () => {
     async function fetchSchema() {
       setFetching(true);
       try {
-        const registryMetaData = await zidenPortal.get(
+        const registryMetaData = await backendServer.get(
           `/registries/${params.requestID}`
         );
         const schemaHash = registryMetaData?.data?.registry?.schema?.schemaHash;
-        const schemaDetail = await zidenPortal.get(`/schemas/${schemaHash}`);
+        const schemaDetail = await backendServer.get(`/schemas/${schemaHash}`);
         let {
           "@name": {},
           "@id": {},

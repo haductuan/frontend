@@ -24,7 +24,7 @@ import {
   CLAIM_REV_NONCE_DB_PATH,
   NO_PRIVATEKEY_MESSAGE,
 } from "./config";
-import { zidenIssuer } from "src/client/api";
+import { issuerServer } from "src/client/api";
 
 //generate key
 const hdkey = require("hdkey");
@@ -269,7 +269,7 @@ export default class KeyContainer {
     // register user to contract
     try {
       const userID = this.decryptFromDB("userID");
-      const userResolve = (await zidenIssuer.get(`/did/resolve/${userID}`)).data;
+      const userResolve = (await issuerServer.get(`/did/resolve/${userID}`)).data;
       if (userResolve.publicKey === "0") {
         const pubkeyX = window.zidenParams.F.toObject(
           window.zidenParams.eddsa.prv2pub(privateKeyBuff)[0]
@@ -278,7 +278,7 @@ export default class KeyContainer {
           window.zidenParams.eddsa.prv2pub(privateKeyBuff)[1]
         ).toString(10);
         const backupKey = this.generateKeyForBackup();
-        await zidenIssuer.post("/did", {
+        await issuerServer.post("/did", {
           userId: userID,
           pubkeyX: pubkeyX,
           pubkeyY: pubkeyY,
@@ -302,7 +302,7 @@ export default class KeyContainer {
     this.generateDataKey();
     try {
       const userID = this.decryptFromDB("userID");
-      const userResolve = (await zidenIssuer.get(`/did/resolve/${userID}`)).data;
+      const userResolve = (await issuerServer.get(`/did/resolve/${userID}`)).data;
       if (userResolve.publicKey === "0") {
         const pubkeyX = window.zidenParams.F.toObject(
           window.zidenParams.eddsa.prv2pub(privateKeyBuff)[0]
@@ -311,7 +311,7 @@ export default class KeyContainer {
           window.zidenParams.eddsa.prv2pub(privateKeyBuff)[1]
         ).toString(10);
         const backupKey = this.generateKeyForBackup();
-        await zidenIssuer.post("/did", {
+        await issuerServer.post("/did", {
           userId: userID,
           pubkeyX: pubkeyX,
           pubkeyY: pubkeyY,

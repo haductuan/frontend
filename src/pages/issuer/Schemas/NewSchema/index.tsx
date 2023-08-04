@@ -14,7 +14,7 @@ import Header from "src/components/Header";
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
-import { zidenIssuerNew } from "src/client/api";
+import { issuerServerNew } from "src/client/api";
 import { AxiosError } from "axios";
 //const
 const baseTypes = [
@@ -129,7 +129,7 @@ const NewSchema = () => {
         };
         return null;
       });
-      await zidenIssuerNew.post("/schemas", jsonData);
+      await issuerServerNew.post("/schemas", jsonData);
       enqueueSnackbar("Add schema success", {
         variant: "success",
       });

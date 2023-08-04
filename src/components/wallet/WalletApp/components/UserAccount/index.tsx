@@ -232,7 +232,7 @@ const UserAccount = () => {
                   Reveal Recovery Phrase
                 </Button>
               )}
-              <Button
+              {/* <Button
                 sx={buttonStyle}
                 fullWidth
                 variant="outlined"
@@ -244,7 +244,7 @@ const UserAccount = () => {
                   }}
                 />
                 Scan QR Code
-              </Button>
+              </Button> */}
               <Button
                 sx={buttonStyle}
                 fullWidth

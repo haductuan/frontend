@@ -5,7 +5,7 @@ import { usePortalContext } from "src/context/PortalContext";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { zidenBackend } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 import { displayTitle } from "src/context/PortalContext";
@@ -26,7 +26,7 @@ const Summary = () => {
 
   const handleGetRegistryData = async () => {
     if (params?.requestID) {
-      const res = await zidenBackend.get(
+      const res = await backendServer.get(
         `/registries/schemas/${params.requestID}`
       );
       return {

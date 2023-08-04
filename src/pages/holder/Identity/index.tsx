@@ -6,7 +6,7 @@ import Header from "src/components/Header";
 import OnDevice from "./components/OnDevice";
 import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { zidenIssuer } from "src/client/api";
+import { issuerServer } from "src/client/api";
 import RequireKYC from "./components/RequireKYC";
 import LoadingClaim from "./components/LoadingClaim";
 
@@ -28,11 +28,11 @@ const Identity = () => {
       const userId = await getZidenUserID();
       const libsodium = keyContainer.getCryptoUtil();
       const keys = keyContainer.generateKeyForBackup();
-      const kycSchema = (await zidenIssuer.get(`/did/kyc`)).data;
+      const kycSchema = (await issuerServer.get(`/did/kyc`)).data;
       const kycSchemaHash = kycSchema.schemaHash;
       setKycRegistyId(kycSchema.registryId);
       const allUserClaimEncode = (
-        await zidenIssuer.get(`/claims/${userId}/retrieve-data`)
+        await issuerServer.get(`/claims/${userId}/retrieve-data`)
       ).data;
 
       let allUserClaimData: Array<any> = [];

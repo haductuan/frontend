@@ -16,7 +16,7 @@ import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import IdentityDetail from "src/components/IdentityDetail";
 import { useDeviceContext } from "src/context/deviceContext";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { ArrowDownIcon, ArrowRightIcon, EmptyIcon } from "src/constants/icon";
 import SearchBar from "src/components/SearchBar";
 import { utils as zidenUtils } from "@zidendev/zidenjs";
@@ -133,7 +133,7 @@ const OnDevice = ({ refresh }: { refresh?: number }) => {
           }
         })
         .filter((item) => item);
-      const resutMetaData = await zidenPortal.get(`/claims?holderId=${userId}`);
+      const resutMetaData = await backendServer.get(`/claims?holderId=${userId}`);
       const claimMetaData = allClaimDecrypted
         .map((item: any, index: number) => {
           try {

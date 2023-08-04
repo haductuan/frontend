@@ -13,7 +13,7 @@ import {
 import { Box } from "@mui/system";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
-import { zidenIssuerNew, zidenPortal } from "src/client/api";
+import { issuerServerNew, backendServer } from "src/client/api";
 import Header from "src/components/Header";
 import {
   Query,
@@ -105,13 +105,13 @@ const Requestv2 = () => {
     async function fetchSchema() {
       setFetching(true);
       try {
-        const registryMetaData = await zidenPortal.get(
+        const registryMetaData = await backendServer.get(
           `/registries/${params.requestID}`
         );
         setRequirements(registryMetaData.data.registry.requirements);
         setMetaData(registryMetaData.data?.registry);
         const schemaHash = registryMetaData?.data?.registry?.schema?.schemaHash;
-        const schemaDetail = await zidenPortal.get(`/schemas/${schemaHash}`);
+        const schemaDetail = await backendServer.get(`/schemas/${schemaHash}`);
         let {
           "@name": {},
           "@id": {},
@@ -219,7 +219,7 @@ const Requestv2 = () => {
         requestBody.append("data", JSON.stringify(formData));
         requestBody.append("zkProofs", JSON.stringify(proofs));
         imageFile && requestBody.append("fileUpload", imageFile);
-        const result = await zidenIssuerNew.post(
+        const result = await issuerServerNew.post(
           `/claims/request/${metaData?.issuer?.issuerId}`,
           requestBody
         );
@@ -287,7 +287,7 @@ const Requestv2 = () => {
   const checkClaimValidation = React.useCallback(
     async (claimData: any, requirement: any) => {
       try {
-        const schemas: any = await zidenPortal.get(
+        const schemas: any = await backendServer.get(
           `/schemas/${requirement.schemaHash}`
         );
 
@@ -360,7 +360,7 @@ const Requestv2 = () => {
 
             try {
               const authPatchRes = (
-                await zidenIssuerNew.get(`/issuers/${userId}/lastest-state`)
+                await issuerServerNew.get(`/issuers/${userId}/lastest-state`)
               ).data;
               resultWitness.userClaimsRoot = BigInt(authPatchRes.claimsRoot);
               resultWitness.userClaimRevRoot = BigInt(
@@ -447,11 +447,11 @@ const Requestv2 = () => {
                 let mtpInput, nonRevInput;
                 let flattenedRawData = flattenData(claim?.claim?.rawData);
                 try {
-                  const claimMtp = await zidenIssuerNew.get(
+                  const claimMtp = await issuerServerNew.get(
                     `/claims/${claim.id}/proof?type=mtp`
                   );
                   mtpInput = claimMtp.data?.kycQueryMTPInput;
-                  const claimNonRevMtp = await zidenIssuerNew.get(
+                  const claimNonRevMtp = await issuerServerNew.get(
                     `/claims/${claim.id}/proof?type=nonRevMtp`
                   );
                   nonRevInput = claimNonRevMtp.data?.kycQueryMTPInput;

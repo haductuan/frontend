@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 
 import React, { useState, useRef } from "react";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { EditIcon, UploadIcon } from "src/constants/icon";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { useVerifierContext } from "src/context/verifierContext";
@@ -76,7 +76,7 @@ const EditInfoFormVerifier = ({ handleClose }: { handleClose: () => void }) => {
       if (logo) {
         bodyData.append("verifierLogo", logo);
       }
-      await zidenPortal.put(`/verifiers/${verifierId}/profiles`, bodyData, {
+      await backendServer.put(`/verifiers/${verifierId}/profiles`, bodyData, {
         headers: {
           Authorization: `${jwz}`,
         },

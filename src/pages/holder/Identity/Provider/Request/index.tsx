@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import Header from "src/components/Header";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { useSnackbar } from "notistack";
 import LoadingComponent from "src/components/LoadingComponent";
 import axios from "axios";
@@ -64,21 +64,21 @@ const Request = () => {
   useEffect(() => {
     async function fetchSchema() {
       setIsSuccess(false);
-      const registryMetaData = await zidenPortal.get(
+      const registryMetaData = await backendServer.get(
         `/registries/${params.requestID}`
       );
       setMetaData(registryMetaData.data?.registry);
 
       const schemaHash = registryMetaData?.data?.registry?.schema?.schemaHash;
-      const schemaDetail = await zidenPortal.get(`/schemas/${schemaHash}`);
+      const schemaDetail = await backendServer.get(`/schemas/${schemaHash}`);
 
       //   setFormSchema(schemaDetail.data.)
 
-      // const response: any = await zidenBackend.get(
+      // const response: any = await backendServer.get(
       //   `/registries/schemas/${params.requestID}`
       // );
 
-      // const res2: any = await zidenBackend.get(
+      // const res2: any = await backendServer.get(
       //   `/registries/schemas/${params.requestID}/request`
       // );
       // setEndpointUrl(res2?.data?.endpointUrl);

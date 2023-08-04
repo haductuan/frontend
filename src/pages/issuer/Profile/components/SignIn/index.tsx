@@ -23,7 +23,7 @@ import {
   utils as zidenUtils,
 } from "@zidendev/zidenjs";
 import { useSnackbar } from "notistack";
-import { zidenIssuerNew, zidenPortal } from "src/client/api";
+import { issuerServerNew, backendServer } from "src/client/api";
 import { ArrowDownIcon } from "src/constants/icon";
 import { SignedChallenge } from "@zidendev/zidenjs";
 import { userType } from "src/constants";
@@ -66,7 +66,7 @@ const SignIn = () => {
     setIsLoading(true);
     try {
       const userID = await getZidenUserID();
-      const res = await zidenIssuerNew.get(
+      const res = await issuerServerNew.get(
         `/issuers/${issuer.id}/operators/${userID}`
       );
       const claimID = res.data?.claimId || "";
@@ -98,10 +98,10 @@ const SignIn = () => {
       issuerClaim.setRevocationNonce(BigInt(issuerRevNonce.toString()));
       issuerClaim.setVersion(BigInt(issuerVersion.toString()));
       const kYCQueryMtp = await (
-        await zidenIssuerNew.get(`/auth/proof/${claimID}?type=mtp`)
+        await issuerServerNew.get(`/auth/proof/${claimID}?type=mtp`)
       ).data?.kycQueryMTPInput;
       const kYCnonRevMtp = await (
-        await zidenIssuerNew.get(`/auth/proof/${claimID}?type=nonRevMtp`)
+        await issuerServerNew.get(`/auth/proof/${claimID}?type=nonRevMtp`)
       ).data?.kycQueryMTPInput;
       // sign message
       const challenge = "123456789";
@@ -177,7 +177,7 @@ const SignIn = () => {
       history.push("/issuer/detail");
     } else {
       const fetchIssuer = async () => {
-        const issuerData = await zidenPortal.get("/issuers");
+        const issuerData = await backendServer.get("/issuers");
         if (issuerData.data?.issuers?.length > 0) {
           setIssuers(
             issuerData.data?.issuers.map((item: any) => {
@@ -328,7 +328,7 @@ const SignIn = () => {
                 }}
               >
                 <MenuItem value={1}>Admin</MenuItem>
-                <MenuItem value={2}>Operator</MenuItem>
+                {/* <MenuItem value={2}>Operator</MenuItem> */}
               </TextField>
               <Box
                 sx={{

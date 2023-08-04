@@ -54,6 +54,8 @@ const GeneralInformation = ({
         variant: "warning",
       });
       return false;
+    } else {
+      console.log("🚀 ~ file: index.tsx:52 ~ verifyData ~ registryData:", registryData)
     }
     return true;
   };

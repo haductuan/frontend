@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useIdWalletContext } from "../identity-wallet-context";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 
 export interface verifierProfileType {
   logo: string;
@@ -44,7 +44,7 @@ export function VerifierContextProvider({
           return;
         }
         setVerifierId(verifierId);
-        const res = (await zidenPortal.get(`/verifiers/${verifierId}`)).data;
+        const res = (await backendServer.get(`/verifiers/${verifierId}`)).data;
         setProfile({
           contact: res.verifier?.contact || "",
           logo: res.verifier?.logoUrl || "",
@@ -63,7 +63,7 @@ export function VerifierContextProvider({
       try {
         const userId = await getZidenUserID();
         if (verifierId === userId) {
-          const res = await zidenPortal.get(
+          const res = await backendServer.get(
             `/verifiers/${verifierId}/operators`
           );
           if (res.data) {

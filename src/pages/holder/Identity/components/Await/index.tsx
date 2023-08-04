@@ -16,7 +16,7 @@ import IdentityDetail from "src/components/IdentityDetail";
 import { useDeviceContext } from "src/context/deviceContext";
 import { ArrowDownIcon, ArrowRightIcon, EmptyIcon } from "src/constants/icon";
 import SearchBar from "src/components/SearchBar";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { userType } from "src/constants";
 import { getAllUserClaim } from "src/utils/db/localStorageDb";
 import UnlockWalletWarning from "../UnlockWalletWarning";
@@ -42,7 +42,7 @@ const Await = () => {
         const userId = await getZidenUserID();
 
         //check for awaiting claims
-        const allClaims = (await zidenPortal.get(`claims?holderId=${userId}`))
+        const allClaims = (await backendServer.get(`claims?holderId=${userId}`))
           ?.data;
         let OndeviceClaimId: Array<any> = [];
         

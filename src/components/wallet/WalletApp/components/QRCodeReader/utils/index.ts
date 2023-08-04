@@ -1,4 +1,4 @@
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import KeyContainer from "src/utils/key-container/keyContainer";
 
 /**
@@ -93,7 +93,7 @@ const handleQRClaim = async (
   checkUserType: any,
 ) => {
   try {
-    const claimData = (await zidenPortal.get(`claims?claimIds=${claimId}`))
+    const claimData = (await backendServer.get(`claims?claimIds=${claimId}`))
       ?.data[0];
     const libsodium = keyContainer.getCryptoUtil();
     const stringData = JSON.stringify({

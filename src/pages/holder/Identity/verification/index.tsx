@@ -19,7 +19,7 @@ import {
 } from "src/constants/icon";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import RequirementDetail from "../../Services/Attestation/components/RequirementDetail";
 import { useDeviceContext } from "src/context/deviceContext";
@@ -41,11 +41,11 @@ const Verification = () => {
   useEffect(() => {
     const fetchData = async () => {
       setFetchComplete(false);
-      const requestData = (await zidenPortal.get(`proofs/${params.id}`)).data;
+      const requestData = (await backendServer.get(`proofs/${params.id}`)).data;
       const serviceId = requestData?.request?.serviceId || "";
       const proofs = requestData?.request?.zkProofs || [];
       setProofs(proofs);
-      const serviceDetail = (await zidenPortal.get(`services/${serviceId}`))
+      const serviceDetail = (await backendServer.get(`services/${serviceId}`))
         .data;
       setProviderData({
         title: serviceDetail?.service?.name,
@@ -75,7 +75,7 @@ const Verification = () => {
   useEffect(() => {
     const verifyProof = async () => {
       const verifyResult = (
-        await zidenPortal.post(`/proofs/verify`, {
+        await backendServer.post(`/proofs/verify`, {
           networkId: "97",
           zkProofs: proofs,
         })

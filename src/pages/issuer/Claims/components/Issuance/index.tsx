@@ -9,7 +9,7 @@ import SearchBar from "src/components/SearchBar";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
-import { zidenIssuer } from "src/client/api";
+import { issuerServer } from "src/client/api";
 
 const headers = [
   { id: "claim_id", label: "Claim ID" },
@@ -36,7 +36,7 @@ const Issuance = (props: any) => {
     if (issuerID) {
       setLoading(true);
       try {
-        const result = await zidenIssuer.get(`/claims/${userId}/raw-data`, {
+        const result = await issuerServer.get(`/claims/${userId}/raw-data`, {
           params: {
             status: ["REVIEWING", "PENDING", "REJECTED"],
           },

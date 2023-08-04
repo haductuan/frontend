@@ -10,7 +10,7 @@ import Summary from "./Components/Summary";
 import KYCProgress from "./Components/KYCProcess";
 import Header from "src/components/Header";
 import { Avatar, Paper } from "@mui/material";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 //icon
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -29,7 +29,7 @@ const KYCContext = () => {
   useEffect(() => {
     const fetch = async () => {
       const res2: any = (
-        await zidenPortal.get(`/registries/${params.requestID}`)
+        await backendServer.get(`/registries/${params.requestID}`)
       ).data?.registry;
       setMetadata({
         title: res2?.schema.name,

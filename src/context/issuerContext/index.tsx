@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useIdWalletContext } from "../identity-wallet-context";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 // import { JWZ } from "src/utils/auth";
 import axios from "axios";
 import { IssuerContextProps } from "src/context/context";
@@ -30,7 +30,7 @@ export function IssuerContextProvider({
     try {
       const issuerID = localStorage.getItem("ziden-db/issuer-id") || "";
       setIssuerID(issuerID);
-      const issuerMetaData = await zidenPortal.get(`/issuers/${issuerID}`);
+      const issuerMetaData = await backendServer.get(`/issuers/${issuerID}`);
       const endpoint = issuerMetaData?.data?.issuer?.endpointUrl || "";
       const network = (await axios.get(`${endpoint}/networks`)).data;
       setNetworks(network || []);

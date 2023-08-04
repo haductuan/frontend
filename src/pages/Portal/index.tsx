@@ -13,7 +13,7 @@ import Summary from "./Components/Summary";
 import KYCProgress from "./Components/KYCProcess";
 import Header from "src/components/Header";
 import { Paper } from "@mui/material";
-import { zidenBackend } from "src/client/api";
+import { backendServer } from "src/client/api";
 //icon
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
@@ -34,7 +34,7 @@ const PortalsContent = () => {
   const params: any = useParams();
   useEffect(() => {
     const fetch = async () => {
-      const res2: any = await zidenBackend.get(
+      const res2: any = await backendServer.get(
         `/registries/schemas/${params.requestID}/request`
       );
       setTitleData({

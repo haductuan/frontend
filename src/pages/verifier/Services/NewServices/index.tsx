@@ -14,7 +14,7 @@ import React, { useState } from "react";
 import Header from "src/components/Header";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import { NavLink, useHistory } from "react-router-dom";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { FormTypeMapping, parseLabel } from "src/utils/claim";
 import ComparedValue from "./customComponents/ComparedValue";
 import { useSnackbar } from "notistack";
@@ -96,7 +96,7 @@ const NewServices = () => {
   const history = useHistory();
   //fetch data
   const fetchAllNetwork = React.useCallback(async () => {
-    const res = await zidenPortal.get("/networks");
+    const res = await backendServer.get("/networks");
     setAllNetWork(
       res.data?.networks?.map((network: any, index: number) => {
         return {
@@ -108,7 +108,7 @@ const NewServices = () => {
     );
   }, []);
   const fetchAllSchema = React.useCallback(async () => {
-    const res = (await zidenPortal.get("/schemas")).data;
+    const res = (await backendServer.get("/schemas")).data;
     setAllSchema(
       res?.schemas?.map((schema: any, index: number) => {
         return {
@@ -257,11 +257,11 @@ const NewServices = () => {
     handleUpdateOption(id, "property", []);
     handleUpdateOption(id, "allowedIssuers", []);
     //fetch issuer
-    const issuerResponse = await zidenPortal.get(
+    const issuerResponse = await backendServer.get(
       `/issuers?schemaHashes=${schema.schemaHash}&networks=${network}`
     );
     const jsonSchema = zidenSchema.getInputSchema(
-      (await zidenPortal.get(`schemas/${schema.hash}`)).data?.schema?.jsonSchema
+      (await backendServer.get(`schemas/${schema.hash}`)).data?.schema?.jsonSchema
     );
     handleUpdateOption(
       id,
@@ -518,7 +518,7 @@ const NewServices = () => {
       const verifierId = await getZidenUserID();
       try {
         setLoading(true);
-        const res = await zidenPortal.post(
+        const res = await backendServer.post(
           "/services",
           {
             title: serviceName,

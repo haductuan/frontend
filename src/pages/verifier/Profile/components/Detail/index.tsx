@@ -19,7 +19,7 @@ import {
 import { useSnackbar } from "notistack";
 import React, { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import Header from "src/components/Header";
 import { PlusIcon } from "src/constants/icon";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
@@ -59,7 +59,7 @@ const Detail = () => {
     setLoading(true);
     try {
       const jwz: any = localStorage.getItem("ziden-db/verifier-jwz") || "";
-      const res = await zidenPortal.delete(
+      const res = await backendServer.delete(
         `/verifiers/${verifierId}/operators/${id}`,
         {
           headers: {
@@ -105,7 +105,7 @@ const Detail = () => {
     setLoading(true);
     try {
       const jwz: any = localStorage.getItem("ziden-db/verifier-jwz") || "";
-      const res = await zidenPortal.post(
+      const res = await backendServer.post(
         `/verifiers/${verifierId}/operators`,
         {
           operatorId: addID,
@@ -170,7 +170,7 @@ const Detail = () => {
       fetchVerifierProfile();
       const fetch = async () => {
         const validateResult = await validateJWZ(
-          zidenPortal.getUri(),
+          backendServer.getUri(),
           "verifier"
         );
         if (!validateResult) {

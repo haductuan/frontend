@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Box, Grid, TextField, MenuItem, Button, Tooltip } from "@mui/material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
-import { zidenBackend } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { useSnackbar } from "notistack";
 import { useHistory } from "react-router-dom";
 
@@ -136,7 +136,7 @@ const SchemaDetail = ({
     });
   };
   const fetchAllSchemaTypes = async () => {
-    const schemasResult = await zidenBackend.get(`/schemas`);
+    const schemasResult = await backendServer.get(`/schemas`);
     setAllSchemaData(schemasResult.data?.schemas || []);
   };
   const handleTemplateChange = (e: any) => {
@@ -162,7 +162,7 @@ const SchemaDetail = ({
   }, []);
   React.useEffect(() => {
     const fetchTypes = async () => {
-      const allTypes = await zidenBackend.get("/schemas/dataTypes");
+      const allTypes = await backendServer.get("/schemas/dataTypes");
       const types = [
         ...allTypes?.data?.dataTypes.map((item: string) => {
           return {
@@ -201,7 +201,7 @@ const SchemaDetail = ({
     });
 
     try {
-      await zidenBackend.post("/registries/schemas", {
+      await backendServer.post("/registries/schemas", {
         ...newSchemaData,
         schema: dataToUpload,
       });

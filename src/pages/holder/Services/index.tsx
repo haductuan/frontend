@@ -22,7 +22,7 @@ import Header from "src/components/Header";
 
 import { NavLink } from "react-router-dom";
 import { useDeviceContext } from "src/context/deviceContext";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import Tooltip from "@mui/material/Tooltip";
 import { useSnackbar } from "notistack";
 import { ArrowDownIcon } from "src/constants/icon";
@@ -39,7 +39,7 @@ const Services = () => {
     const fetch = async () => {
       setLoading(true);
       try {
-        const allServices = await zidenPortal.get("services");
+        const allServices = await backendServer.get("services");
         if (allServices?.data) {
           const services = allServices?.data?.services
             ?.filter((service: any) => service.active)

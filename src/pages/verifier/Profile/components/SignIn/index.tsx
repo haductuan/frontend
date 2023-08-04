@@ -32,7 +32,7 @@ import {
   parseIssuerClaimMtp,
   parseNonRevMtp,
 } from "src/utils/claim";
-import { zidenPortal } from "src/client/api";
+import { backendServer } from "src/client/api";
 import { ArrowDownIcon } from "src/constants/icon";
 import { LoadingButton } from "@mui/lab";
 import { userType } from "src/constants";
@@ -69,7 +69,7 @@ const SignIn = () => {
     try {
       const userID = await getZidenUserID();
       const res = (
-        await zidenPortal.get(`verifiers/${verifierID}/operators/${userID}`)
+        await backendServer.get(`verifiers/${verifierID}/operators/${userID}`)
       ).data;
       console.log("🚀 ~ file: index.tsx:74 ~ handleSignIn ~ res:", res);
       const verifierClaimID = res?.claimId;
@@ -102,10 +102,10 @@ const SignIn = () => {
         verifierClaim.setRevocationNonce(BigInt(verifierRevNonce.toString()));
         verifierClaim.setVersion(BigInt(verifierVersion.toString()));
         const kYCQueryMTP = (
-          await zidenPortal.get(`/auth/proof/${verifierClaimID}?type=mtp`)
+          await backendServer.get(`/auth/proof/${verifierClaimID}?type=mtp`)
         ).data?.kycQueryMTPInput;
         const kYCnonRevMtp = (
-          await zidenPortal.get(`/auth/proof/${verifierClaimID}?type=nonRevMtp`)
+          await backendServer.get(`/auth/proof/${verifierClaimID}?type=nonRevMtp`)
         ).data?.kycQueryMTPInput;
         // sign message
         const challenge = "123456789";
@@ -146,7 +146,7 @@ const SignIn = () => {
           query
         );
         const data = await generateProof(input);
-        const jwz = await zidenPortal.post(`/auth/login/${verifierID}`, {
+        const jwz = await backendServer.post(`/auth/login/${verifierID}`, {
           proof: data?.proof,
           public_signals: data?.publicSignals,
           circuitId: "string",
@@ -186,7 +186,7 @@ const SignIn = () => {
       history.push("/verifier/detail");
     } else {
       const fetchVerifier = async () => {
-        const verifierData = (await zidenPortal.get("/verifiers")).data;
+        const verifierData = (await backendServer.get("/verifiers")).data;
         setVerifier(
           verifierData?.verifiers?.map((verifier: any, inex: number) => {
             return {
@@ -332,7 +332,7 @@ const SignIn = () => {
                 }}
               >
                 <MenuItem value={1}>Admin</MenuItem>
-                <MenuItem value={2}>Operator</MenuItem>
+                {/* <MenuItem value={2}>Operator</MenuItem> */}
               </TextField>
               <Box
                 sx={{

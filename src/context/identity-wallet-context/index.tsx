@@ -8,7 +8,7 @@ import KeyContainer from "src/utils/key-container/keyContainer";
 import { userType } from "src/constants";
 import { useSnackbar } from "notistack";
 import { IdentityWalletContextProps } from "src/context/context";
-import { zidenIssuer } from "src/client/api";
+import { issuerServer } from "src/client/api";
 
 const IdWalletContext = React.createContext<IdentityWalletContextProps>(
   undefined as any
@@ -157,7 +157,7 @@ export function IdentityWalletProvider({ children }: { children: ReactNode }) {
     const keys = keyContainer.generateKeyForBackup();
 
     const allUserClaimEncode = (
-      await zidenIssuer.get(`/claims/${userId}/retrieve-data`)
+      await issuerServer.get(`/claims/${userId}/retrieve-data`)
     ).data;
 
     let allUserClaimData: Array<any> = [];

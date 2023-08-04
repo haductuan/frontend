@@ -17,7 +17,7 @@ import {
 import CloseIcon from "@mui/icons-material/Close";
 import { Box } from "@mui/system";
 import React, { useState, useEffect } from "react";
-import { zidenIssuerNew } from "src/client/api";
+import { issuerServerNew } from "src/client/api";
 import { EmptyIcon } from "src/constants/icon";
 import { useIdWalletContext } from "src/context/identity-wallet-context";
 import ClaimDetail, { detailDataType } from "../ClaimDetail";
@@ -120,7 +120,7 @@ const TableData = ({
   const accept = async (claimId: string) => {
     const jwz = localStorage.getItem("ziden-db/issuer-jwz");
     try {
-      await zidenIssuerNew.put(
+      await issuerServerNew.put(
         `/claims/${userId}/${claimId}/status/PENDING`,
         {},
         {
@@ -136,7 +136,7 @@ const TableData = ({
   const reject = async (claimId: string) => {
     const jwz = localStorage.getItem("ziden-db/issuer-jwz");
     try {
-      await zidenIssuerNew.put(
+      await issuerServerNew.put(
         `/claims/${userId}/${claimId}/status/REJECT`,
         {},
         {

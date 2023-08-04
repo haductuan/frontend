@@ -34,7 +34,7 @@ const Congrat = () => {
           lineHeight: "1.1875rem",
         }}
       >
-        You are ready to use Ziden Wallet!
+        You are ready to use Wallet!
       </Typography>
       <Box
         sx={{
