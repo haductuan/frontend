@@ -499,6 +499,7 @@ export default class KeyContainer {
       libsodium.from_hex(privHex),
       "hex"
     );
+    console.log("🚀 ~ file: keyContainer.ts:504 ~ KeyContainer ~ generateKeyForBackup ~ privHex:", privHex)
     return {
       privateKey: privHex,
       publicKey: publicKeyHex,

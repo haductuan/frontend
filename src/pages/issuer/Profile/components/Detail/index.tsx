@@ -567,7 +567,7 @@ const Detail = () => {
                 </Button>
               </Box>
             </Grid>
-            {/* {operators && (
+            {operators && (
               <Grid item xs={12} xsm={12} sm={12} lg={7} xl={7}>
                 <Paper
                   sx={{
@@ -690,7 +690,7 @@ const Detail = () => {
                   </TableContainer>
                 </Paper>
               </Grid>
-            )} */}
+            )}
           </Grid>
         </Box>
       </Box>

@@ -333,7 +333,7 @@ const SignIn = () => {
                 }}
               >
                 <MenuItem value={1}>Admin</MenuItem>
-                {/* <MenuItem value={2}>Operator</MenuItem> */}
+                <MenuItem value={2}>Operator</MenuItem>
               </TextField>
               <Box
                 sx={{

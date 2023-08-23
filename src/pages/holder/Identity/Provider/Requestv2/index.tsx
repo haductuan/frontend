@@ -189,6 +189,7 @@ const Requestv2 = () => {
           return checkClaimValidation(item.validClaim, item);
         })
       );
+      console.log("🚀 ~ file: index.tsx:192 ~ handleConfirm ~ witness:", witness)
 
       const proofs = await Promise.all(
         witness
@@ -220,6 +221,16 @@ const Requestv2 = () => {
         requestBody.append("registryId", params.requestID);
         requestBody.append("data", JSON.stringify(formData));
         requestBody.append("zkProofs", JSON.stringify(proofs));
+        console.log("🚀 ~ file: index.tsx:224 ~ handleConfirm ~ proofs:", proofs)
+
+        if (proofs[0] == null && requirements.length > 0) {
+          enqueueSnackbar("Attest requirement failed!", {
+            variant: "error",
+          });
+          setLoading(false);
+          return;
+        }
+
         imageFile && requestBody.append("fileUpload", imageFile);
         const result = await issuerServerNew.post(
           `/claims/request/${metaData?.issuer?.issuerId}`,
@@ -263,10 +274,6 @@ const Requestv2 = () => {
           setLoading(false);
           return;
         }
-
-        //Auto backup
-        //@ts-ignore
-        // const backupKeys = keyContainer.generateKeyForBackup();
 
         enqueueSnackbar("Get claim success!", {
           variant: "success",
@@ -704,12 +711,20 @@ const Requestv2 = () => {
                         for (let i = 0; i < item.allowedIssuers.length; i++) {
                           issueBy.push(item.allowedIssuers[i].name);
                         }
-
+                        const OPERATOR_TYPE = ["existed", "matching", "upper bound", "greater than", "membership", "non membership", "in range"];
+                        console.log(item)
+                        const operator = item.query.operator;
+                        let value: any;
+                        if (operator < 4) {
+                          value = item.query.value[0];
+                        } else { 
+                          value = item.query.value;
+                        }
                         return (
                           <Typography
                             variant="body1"
                             color="text.secondary"
-                          >{`- Description: ${item.attestation}; Schema: ${item.schema.name}; Issue By: ${issueBy}`}</Typography>
+                          >{`- Description: ${item.attestation}; Schema: ${item.schema.name}; Issue By: ${issueBy}; ${item.query.propertyName} is ${OPERATOR_TYPE[operator]} ${value}`}</Typography>
                         );
                       })}
                     </Box>
