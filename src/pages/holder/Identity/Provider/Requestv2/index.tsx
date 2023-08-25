@@ -97,7 +97,6 @@ const Requestv2 = () => {
   const [helperText, setHelperText] = useState<any>({});
   const [requirements, setRequirements] = useState<Array<any>>([]);
   const [processedRequireData, setProcessedRequireData] = useState<any>();
-
   const [allClaims, setAllclaims] = useState<any>();
   const [imageFile, setImageFile] = useState<Blob>();
 
@@ -121,6 +120,7 @@ const Requestv2 = () => {
         } = zidenSchema.getInputSchema(schemaDetail.data.schema?.jsonSchema);
         setForm(schemaToDisplay);
         setRequired(schemaDetail.data.schema?.jsonSchema["@required"]);
+        
       } catch (err) {
         setFetching(false);
       }
@@ -189,8 +189,6 @@ const Requestv2 = () => {
           return checkClaimValidation(item.validClaim, item);
         })
       );
-      console.log("🚀 ~ file: index.tsx:192 ~ handleConfirm ~ witness:", witness)
-
       const proofs = await Promise.all(
         witness
           .map(async (result) => {
@@ -210,7 +208,7 @@ const Requestv2 = () => {
           })
           .map((res) => res)
       );
-      console.log("🚀 ~ file: index.tsx:211 ~ handleConfirm ~ proofs:", proofs)
+
       setHelperText({});
 
       try {
@@ -304,7 +302,11 @@ const Requestv2 = () => {
           schema.schemaPropertiesSlot(schemas.data?.schema?.jsonSchema)
         )[requirement.query.propertyName];
 
-        const challenge = BigInt(1);
+        const challengeResponse = await issuerServerNew.get(
+          `/registries/${params.requestID}/challenge`
+        );
+        const challenge = BigInt(challengeResponse.data.challenge?? "1");
+
         if (isUnlocked && claimData) {
           //get issuer claim from claim data
           const issuerClaimArr = claimData.claim.claim.map((item: any) => {
@@ -358,7 +360,7 @@ const Requestv2 = () => {
                 issuerClaim,
                 privateKeyBuff,
                 authClaims,
-                BigInt(1),
+                challenge,
                 userTree,
                 parseIssuerClaimMtp(requirement.issuerClaimMtp),
                 parseNonRevMtp(requirement.nonRevMtp),
@@ -712,7 +714,6 @@ const Requestv2 = () => {
                           issueBy.push(item.allowedIssuers[i].name);
                         }
                         const OPERATOR_TYPE = ["existed", "matching", "upper bound", "greater than", "membership", "non membership", "in range"];
-                        console.log(item)
                         const operator = item.query.operator;
                         let value: any;
                         if (operator < 4) {
