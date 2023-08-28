@@ -59,7 +59,7 @@ const SignIn = () => {
   const history = useHistory();
   const handleSignIn = async () => {
     if (!verifierID) {
-      enqueueSnackbar("Please select issuer!", {
+      enqueueSnackbar("Please select verifier", {
         variant: "info",
         autoHideDuration: 2000,
       });
@@ -80,7 +80,7 @@ const SignIn = () => {
         const verifierRevNonce = res?.revNonce || 1;
         const verifierVersion = res?.version || 0;
         const valueA = zidenUtils.numToBits(BigInt(role), 32);
-        const valueB = zidenUtils.numToBits(BigInt(0), 32);
+        const valueB = zidenUtils.numToBits(BigInt("0x" + verifierID) + BigInt("0x" + role), 32);
         const userTree = await keyContainer.getUserTree();
         const verifierClaim = zidenjsClaim.newClaim(
           schemaHash,
@@ -125,14 +125,14 @@ const SignIn = () => {
           challengeSignatureS: signature.challengeSignatureS,
         } as SignedChallenge;
         
-
+        
         const query: Query = {
-          slotIndex: 6,
+          slotIndex: 7,
           operator: OPERATOR.EQUAL,
-          values: [BigInt(role)],
+          values: [BigInt("0x" + verifierID) + BigInt("0x" + role)],
           valueTreeDepth: 6,
           from: 0,
-          to: 100,
+          to: 253,
           timestamp: Date.now(),
           claimSchema: BigInt(String(res.schemaHash)),
         };

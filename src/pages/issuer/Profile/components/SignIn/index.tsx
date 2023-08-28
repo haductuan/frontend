@@ -76,7 +76,7 @@ const SignIn = () => {
         BigInt(String(res.data.schemaHash))
       );
       const valueA = zidenUtils.numToBits(BigInt(role), 32);
-      const valueB = zidenUtils.numToBits(BigInt(0), 32);
+      const valueB = zidenUtils.numToBits(BigInt("0x" + issuer.id) + BigInt("0x" + role), 32);
       const userTree = await keyContainer.getUserTree();
       const issuerClaim = zidenjsClaim.newClaim(
         schemaHash,
@@ -119,12 +119,12 @@ const SignIn = () => {
       } as SignedChallenge;
       
       const query: Query = {
-        slotIndex: 6,
+        slotIndex: 7,
         operator: OPERATOR.EQUAL,
-        values: [BigInt(role)],
+        values: [BigInt("0x" + issuer.id) + BigInt("0x" + role)],
         valueTreeDepth: 6,
         from: 0,
-        to: 100,
+        to: 253,
         timestamp: Date.now(),
         claimSchema: BigInt(String(res.data.schemaHash)),
       };
